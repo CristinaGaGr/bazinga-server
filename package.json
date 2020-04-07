@@ -1,0 +1,23 @@
+{
+  "name": "questiona2-server",
+  "version": "1.0.0",
+  "description": "Backend Api for Qestiona2 trivial app",
+  "main": "App.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CristinaGaGr/questiona2-server.git"
+  },
+  "author": "Cristina & Joaquim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CristinaGaGr/questiona2-server/issues"
+  },
+  "homepage": "https://github.com/CristinaGaGr/questiona2-server#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.9.7"
+  }
+}
