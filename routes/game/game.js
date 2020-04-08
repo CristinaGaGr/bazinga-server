@@ -8,7 +8,6 @@ router.get('/newgame', (req, res, next) => {
 
 router.post('/newgame', (req, res) => {
     res.json({ response: "post ->/game/newgame" })
-
 });
 
 
@@ -20,7 +19,6 @@ router.get('/join', (req, res, next) => {
 
 router.post('/join', (req, res) => {
     res.json({ response: "post ->/game/join" })
-
 });
 
 

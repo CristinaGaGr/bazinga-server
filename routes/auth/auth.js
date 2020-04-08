@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-var User = require('../../models/user')
+var User = require('../../models/user');
 
 router.get('/signin', (req, res, next) => {
     res.json({ response: "Get->/auth/Signin" })

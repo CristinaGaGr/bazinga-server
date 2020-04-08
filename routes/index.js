@@ -1,10 +1,9 @@
-var express = require('express');
-var router = express.Router();
-var user = require('../models/user')
+const express = require('express');
+const router = express.Router();
+const user = require('../models/user')
 
 function validateEmail(email) {
-    console.log(email)
-    var re = /[a-z0-9!#$%&'*+\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/g;
+    const re = /[a-z0-9!#$%&'*+\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/g;
     return re.test(email);
 }
 
@@ -24,35 +23,33 @@ router.get('/signup', (req, res, next) => {
 
 
 router.post('/signup', async (req, res, next) => {
-    let { username, password, repeatPassword, email } = req.body
+    let { username, password, repeatPassword, email } = req.body;
     let error = {
         response: [],
         status: false
-    }
+    };
 
-    let responsedb = await user.find({ username })
+    let responsedb = await user.find({ username });
     if (responsedb.length !== 0) {
-        error.status = true
+        error.status = true;
         error.response.push("username exists")
     }
     if (!validateEmail(email)) {
-        error.status = true
+        error.status = true;
         error.response.push("Email are not valid")
 
     }
 
     if (password !== repeatPassword) {
-        error.status = true
+        error.status = true;
         error.response.push("Passwords are not identical")
-
     }
 
     if (error.status === false) {
-        user.create({ username, password, email })
+        user.create({ username, password, email });
         res.json({ response: req.body, route: req.route.path, method: req.route.methods, error })
     } else {
         res.json(error)
-
     }
 });
 
