@@ -5,7 +5,7 @@ const game = new Schema({
     users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     owner: { type: Schema.Types.ObjectId, ref: 'User' },
     pinCode: Number,
-    Status: String,
+    status: String,
     gameStarted: Boolean,
     questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
     actualQuestion: Number,
