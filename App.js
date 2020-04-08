@@ -1,10 +1,10 @@
 require("dotenv").config();
 
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 const http = require('http');
 
 const cors = require("cors");
@@ -25,12 +25,12 @@ mongoose
         console.error("Error connecting to mongo", err);
     });
 
-var indexRouter = require("./routes/index");
-var authRouter = require('./routes/auth/auth')
-var gameRouter = require('./routes/game/game')
+const indexRouter = require("./routes/index");
+const authRouter = require('./routes/auth/auth');
+const gameRouter = require('./routes/game/game');
 
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -59,7 +59,7 @@ app.use(
 
 app.use("/", indexRouter);
 app.use('/game', gameRouter);
-app.use('/auth', authRouter)
+app.use('/auth', authRouter);
 // 
 
 // catch 404 and forward to error handler
@@ -77,10 +77,7 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render("error");
 });
-let server = http.createServer(app);
 
-server.listen(process.env.PORT, () => {
-    console.log(`Listening on http://localhost:${process.env.PORT}`);
-});
+
 
 module.exports = app;
