@@ -11,7 +11,6 @@ const cors = require("cors");
 
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-console.log(process.env)
 mongoose
     .connect(`mongodb://localhost/${process.env.DBNAME}`, {
         useNewUrlParser: true,
