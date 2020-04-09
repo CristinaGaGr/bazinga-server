@@ -79,8 +79,6 @@ app.use(function (err, req, res, next) {
 });
 let server = http.createServer(app);
 
-server.listen(process.env.PORT, () => {
-    console.log(`Listening on http://localhost:${process.env.PORT}`);
-});
+
 
 module.exports = app;

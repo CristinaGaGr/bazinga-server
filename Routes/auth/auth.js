@@ -40,7 +40,21 @@ router.post('/signin', (req, res) => {
 
 });
 
+router.post('/delete', (req, res) => {
+    User.findOneAndDelete({ username: req.body.username }, (err, response) => {
+        if (err) throw err;
+        if (response === null) {
+            res.json({ action: "user not exist", response: response })
 
+        } else {
+
+            res.json({ action: "user Deleted", response: response })
+        }
+
+    })
+
+
+});
 
 
 router.post('/logout', (req, res) => {
