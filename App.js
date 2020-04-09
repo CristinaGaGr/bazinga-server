@@ -57,9 +57,28 @@ app.use(
     })
 );
 
+
+
+app.use((req, res, next) => {
+    const token = req.cookies.bazinga;
+    if (token) {
+        Jwt.verify(token, process.env.PRIVATEKEY, (err, decoded) => {
+            if (err) {
+                return res.json({ mensaje: 'Token inválida' });
+            } else {
+                req.userId = decoded;
+                next();
+            }
+        });
+    } else {
+        req.userId = null;
+        next();
+
+    }
+});
+
 app.use("/", indexRouter);
 app.use('/game', gameRouter);
-
 //middleware jwt
 app.use('/auth', authRouter);
 // 

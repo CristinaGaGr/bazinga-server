@@ -6,25 +6,7 @@ function validateEmail(email) {
     const re = /[a-z0-9!#$%&'*+\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/g;
     return re.test(email);
 }
-const UserCheckToken = express.Router();
 
-UserCheckToken.use((req, res, next) => {
-    const token = req.cookies.bazinga;
-    if (token) {
-        Jwt.verify(token, process.env.PRIVATEKEY, (err, decoded) => {
-            if (err) {
-                return res.json({ mensaje: 'Token inválida' });
-            } else {
-                req._id = decoded;
-                next();
-            }
-        });
-    } else {
-        req._id = null;
-        next();
-
-    }
-});
 
 
 
@@ -35,15 +17,14 @@ router.get('/', function (req, res, next) {
     });
 });
 
-router.post('/me', UserCheckToken, (req, res, next) => {
-    if (req._id) {
-        User.findById(req._id, (err, response) => {
+router.post('/me', (req, res, next) => {
+    if (req.userId) {
+        User.findById(req.userId, (err, response) => {
             let { username, email } = response;
-            res.json({ data: { username, email } });
+            res.send(username);
         })
     } else {
-        res.json({ response: "me->/me", user: req._id })
-
+        res.send(null)
     }
 
 });
@@ -96,6 +77,7 @@ router.post('/signin', (req, res) => {
         if (respUser === null) {
             res.json(
                 {
+
                     error: "User not exist"
                 }
             )
@@ -115,7 +97,7 @@ router.post('/signin', (req, res) => {
                     res.json({ respUser, login: true });
 
                 } else {
-
+                    //401
                     res.json({ error: "No valid password", login: false });
 
                 }
