@@ -6,10 +6,9 @@ function validateEmail(email) {
     const re = /[a-z0-9!#$%&'*+\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/g;
     return re.test(email);
 }
-const rutasProtegidas = express.Router();
+const UserCheckToken = express.Router();
 
-rutasProtegidas.use((req, res, next) => {
-
+UserCheckToken.use((req, res, next) => {
     const token = req.cookies.bazinga;
     if (token) {
         Jwt.verify(token, process.env.PRIVATEKEY, (err, decoded) => {
@@ -21,7 +20,7 @@ rutasProtegidas.use((req, res, next) => {
             }
         });
     } else {
-        req._id = null
+        req._id = null;
         next();
 
     }
@@ -36,11 +35,11 @@ router.get('/', function (req, res, next) {
     });
 });
 
-router.post('/me', rutasProtegidas, (req, res, next) => {
+router.post('/me', UserCheckToken, (req, res, next) => {
     if (req._id) {
         User.findById(req._id, (err, response) => {
-            let { username, email } = response
-            res.json({ data: { username, email } })
+            let { username, email } = response;
+            res.json({ data: { username, email } });
         })
     } else {
         res.json({ response: "me->/me", user: req._id })
