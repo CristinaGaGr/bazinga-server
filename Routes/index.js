@@ -37,7 +37,7 @@ router.post('/signup', async (req, res, next) => {
     }
     if (!validateEmail(email)) {
         error.status = true
-        error.response.push("Email are not valid")
+        error.response.push("Email not valid")
 
     }
 

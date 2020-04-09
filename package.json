@@ -4,6 +4,7 @@
   "description": "Backend Api for Qestiona2 trivial app",
   "main": "App.js",
   "scripts": {
+    "start": "nodemon bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
