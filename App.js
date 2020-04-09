@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+const jwtDecode = require('jwt-decode')
 const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
@@ -59,6 +59,8 @@ app.use(
 
 app.use("/", indexRouter);
 app.use('/game', gameRouter);
+
+//middleware jwt
 app.use('/auth', authRouter);
 // 
 
