@@ -41,7 +41,7 @@ router.head('/join', (req, res, next) => {  //<<--- validar username  (/:pincode
 });
 
 
-router.post('/join', (req, res) => {
+router.post('/join', async (req, res) => {
     let username = req.body.username
     if (req.userId) {
         await User.findById(req.userId, (err, resp) => { username = resp.username })
