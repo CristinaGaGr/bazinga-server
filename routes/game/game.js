@@ -65,8 +65,8 @@ router.head('/join', async (req, res, next) => {  //<<--- validar username  (/:p
 
 router.post('/join', async (req, res) => {    //<<<--- (pincode----username)
 
-    let actualGame = await Actualgames({ pin: req.body.pin })
-    if (actualGame.username.game_id == "") {
+    let actualGame = await Actualgames.findOne({ pin: +req.body.pin });
+    if (actualGame.game_id.id === "") {
         res.status(404).send("pincode not valid or game started") //falta posar e status correcte.
     } else {
 
