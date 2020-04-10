@@ -13,9 +13,7 @@ function validateEmail(email) {
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-    res.json({
-        response: 'home'
-    });
+   res.send({ response: "I am alive" }).status(200);
 });
 
 router.get('/me', (req, res, next) => {
@@ -27,7 +25,6 @@ router.get('/me', (req, res, next) => {
     } else {
         res.send(null)
     }
-
 });
 
 

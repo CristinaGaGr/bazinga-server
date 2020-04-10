@@ -7,7 +7,7 @@
 const app = require('../App');
 const debug = require('debug')('express-generator-test:server');
 const http = require('http');
-const io = require("socket.io")(http)
+// const io = require("socket.io")(http)
 
 /**
  * Get port from environment and store in Express.
@@ -25,42 +25,35 @@ const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
+const socketIo = require("socket.io");
+
+
+const io = socketIo(server); // < Interesting!
+
+const getApiAndEmit = async socket => {
+  try {
+    socket.emit("FromAPI", 'hi'); // Emitting a new message. It will be consumed by the client
+  } catch (error) {
+    console.error(`Error: ${error.code}`);
+  }
+};
+
+
+io.on("connection", socket => {
+  console.log("New client connected"), setInterval(
+      () => getApiAndEmit(socket),
+      10000
+  );
+  socket.on("disconnect", () => console.log("Client disconnected"));
+});
+
+
 
 server.listen(process.env.PORT, () => {
   console.log(`Listening on http://localhost:${process.env.PORT}`);
 });
 server.on('error', onError);
 server.on('listening', onListening);
-
-
-
-io.sockets.on('connection', function (socket) {
-
-  socket.on('start', function (id) {
-    console.log("starting game")
-    socket.emit('question', "rooms", 'General');
-  })
-
-  socket.on('answer', function (id) {
-    console.log("answer recived")
-    socket.emit('score', "rooms", 'General');
-    socket.emit('question', "rooms", 'General');
-  })
-
-  // when the user disconnects.. perform this
-  socket.on('disconnect', function () {
-    console.log("disconect")
-    socket.leave(socket.room);
-  });
-
-
-});
-
-
-
-
-
-
 
 
 /**

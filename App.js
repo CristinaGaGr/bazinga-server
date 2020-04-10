@@ -13,7 +13,6 @@ const Questions = require("./models/questions")
 const routeToQuestions ="seed/questions.json"
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const io = require('socket.io')
 
 mongoose
     .connect(`mongodb://localhost/${process.env.DBNAME}`, {
@@ -110,7 +109,6 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render("error");
 });
-
 
 
 module.exports = app;
