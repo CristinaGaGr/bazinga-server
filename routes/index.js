@@ -55,7 +55,7 @@ router.post('/signup', async (req, res) => {
     }
 
     if (error.status === false) {
-        User.create({ username: username + Math.random() * 230, password, email }, (err, respUser) => {
+        User.create({ username: username, password, email }, (err, respUser) => {
             const token = Jwt.sign({ _id: respUser._id }, process.env.PRIVATEKEY, { expiresIn: '12h' });
             res.cookie('bazinga', token, {
                 maxAge: 43200000,
