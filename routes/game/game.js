@@ -5,7 +5,7 @@ const Game = require('../../models/game')
 const Actualgames = require("../../models/actual")
 
 const pinGenerator = async(userId) => {
-    let pin = Math.floor(Math.random() * 10000)
+    let pin = Math.floor(Math.random() * 9000)+1000
     let game_id = null
     if (await Actualgames.find({ pin }) == "") {
         let game = await Game.create({})

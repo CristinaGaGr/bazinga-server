@@ -4,7 +4,7 @@
   "description": "Backend Api for Qestiona2 trivial app",
   "main": "App.js",
   "scripts": {
-    "start": "node bin/www.js",
+    "start": "nodemon bin/www.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -31,6 +31,7 @@
     "jwt-decode": "^2.2.0",
     "mongoose": "^5.9.7",
     "morgan": "^1.10.0",
-    "serve-favicon": "^2.5.0"
+    "serve-favicon": "^2.5.0",
+    "socket.io": "^2.3.0"
   }
 }

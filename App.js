@@ -13,6 +13,8 @@ const Questions = require("./models/questions")
 const routeToQuestions ="seed/questions.json"
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const io = require('socket.io')
+
 mongoose
     .connect(`mongodb://localhost/${process.env.DBNAME}`, {
         useNewUrlParser: true,
