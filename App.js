@@ -7,9 +7,10 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const http = require('http');
 const Jwt = require('jsonwebtoken')
-
+const fs = require("fs")
 const cors = require("cors");
-
+const Questions = require("./models/questions")
+const routeToQuestions ="seed/questions.json"
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 mongoose
@@ -27,6 +28,15 @@ mongoose
         console.error("Error connecting to mongo", err);
     });
 
+Questions.countDocuments((err, count) => {
+    if (count === 0) {
+        fs.readFile(routeToQuestions, (err, data) => {
+            if (err) throw err;
+            Questions.create(JSON.parse(data))
+
+        })
+    } 
+})
 const indexRouter = require("./routes/index");
 const authRouter = require('./routes/auth/auth');
 const gameRouter = require('./routes/game/game');
