@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const gameSchema = new Schema({
     users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    noLogedUsers:[],
     owner: { type: Schema.Types.ObjectId, ref: 'User' },
     status: { type: String, default: 'wating to users' },
     gameStarted: { type: Boolean, default: false },
