@@ -34,21 +34,11 @@ const gameRouter = require('./routes/game/game');
 
 const app = express();
 
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
 
 // Middleware Setup
 
 app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-
-// app.use(favicon(path.join(__dirname, "public", "images", "favicon.ico")));
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
 // ADD CORS SETTINGS HERE TO ALLOW CROSS-ORIGIN INTERACTION:
 
@@ -58,6 +48,10 @@ app.use(
         origin: [`http://localhost:${process.env.FRONT}`] // <== this will be the URL of our React app (it will be running on port 3000)
     })
 );
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 
 
 //middleware jwt
