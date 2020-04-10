@@ -70,8 +70,8 @@ app.use((req, res, next) => {
             }
         });
     } else {
-
-        req.userId = null;
+        req.userId = '5e906d024ca19c4c94e0a6f4';
+        // req.userId = null;
         next();
 
     }
