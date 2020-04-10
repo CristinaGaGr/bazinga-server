@@ -6,6 +6,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const http = require('http');
+const Jwt = require('jsonwebtoken')
 
 const cors = require("cors");
 
@@ -14,7 +15,8 @@ const mongoose = require("mongoose");
 mongoose
     .connect(`mongodb://localhost/${process.env.DBNAME}`, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useFindAndModify: false
     })
     .then(x => {
         console.log(
@@ -58,12 +60,15 @@ app.use(
 );
 
 
+//middleware jwt
 
 app.use((req, res, next) => {
     const token = req.cookies.bazinga;
     if (token) {
         Jwt.verify(token, process.env.PRIVATEKEY, (err, decoded) => {
             if (err) {
+                next()
+
                 return res.json({ mensaje: 'Token inválida' });
             } else {
                 req.userId = decoded;
@@ -71,15 +76,16 @@ app.use((req, res, next) => {
             }
         });
     } else {
+
         req.userId = null;
         next();
 
     }
+
 });
 
 app.use("/", indexRouter);
 app.use('/game', gameRouter);
-//middleware jwt
 app.use('/auth', authRouter);
 // 
 
