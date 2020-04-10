@@ -4,14 +4,14 @@ const User = require('../../models/user');
 const Game = require('../../models/game')
 const Actualgames = require("../../models/actual")
 
-const pinGenerator = async () => {
+const pinGenerator = async(userId) => {
     let pin = Math.floor(Math.random() * 10000)
     let game_id = null
     if (await Actualgames.find({ pin }) == "") {
         let game = await Game.create({})
         game_id = game._id
 
-        await Actualgames.create({ pin, game_id })
+        await Actualgames.create({ pin, game_id, owner: userId })
 
     } else {
         //apartir de 7000 salas va EXTREMADAMENTE LENTO... NOSE SI SERIA MEJOR BAJARME TODO EL ARRAY EN LOCAL I HACER LA VALIDACION LOCALMENTE. 
@@ -29,9 +29,8 @@ router.post('/', async (req, res) => {
     if (req.userId) {
         await User.findById(req.userId, (err, resp) => { username = resp.username })
     }
-    let { pin, game_id } = await pinGenerator()
+    let { pin, game_id } = await pinGenerator(req.userId)
     res.send({ pin, game_id }) //respondo con la info y despues actualizo el modelo de forma asyncrona
-    Game.findByIdAndUpdate(game_id, { owner: req.userId }, () => console.log("game updated"))
 });
 
 //  let username = req.body.username
@@ -68,7 +67,7 @@ router.post('/join', async (req, res) => {    //<<<--- (pincode----username)
 
     let actualGame = await Actualgames({ pin: req.body.pin })
     if (actualGame.username.game_id == "") {
-        res.status(200).send("pincode not valid or game started") //falta posar e status correcte.
+        res.status(404).send("pincode not valid or game started") //falta posar e status correcte.
     } else {
 
         if (req.userId) {
