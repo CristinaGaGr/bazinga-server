@@ -20,7 +20,7 @@ const pinGenerator = async () => {
     return { pin, game_id }
 }
 const addToGame = () => {
-    
+
 }
 
 
@@ -30,25 +30,58 @@ router.post('/', async (req, res) => {
         await User.findById(req.userId, (err, resp) => { username = resp.username })
     }
     let { pin, game_id } = await pinGenerator()
-    res.send({ pin, game_id })
-    Game.findByIdAndUpdate(game_id, { owner: req.userId },()=>console.log("game updated"))
+    res.send({ pin, game_id }) //respondo con la info y despues actualizo el modelo de forma asyncrona
+    Game.findByIdAndUpdate(game_id, { owner: req.userId }, () => console.log("game updated"))
+});
+
+//  let username = req.body.username
+// if (req.userId) {
+//     await User.findById(req.userId, (err, resp) => { username = resp.username })
+//     res.send("ok logged user")
+// } else {
+
+router.head('/join', async (req, res, next) => {  //<<--- validar username  (/:pincode/:username)
+    // let actualGame = await Actualgames({ pin: req.body.pin })
+    // if (actualGame == "") {
+    //     res.send("not valid pin")
+    // } else {
+    //     if (req.userId) {
+    //         //  await User.findById(req.userId, (err, resp) => { username = resp.username })
+    //         res.send("user con token nombre usuario siempre valido")
+    //     } else {
+
+    //         let response = await Game.findById(actualGame.game_id).populate("User")
+    //         if (response.noLogedUsers.indexOf(username) === -1 && response.users.username.indexOf()) {
+    //             res.status(200)
+    //         } else {
+    //             res.status(409).
+    //         }
+    //     }
+    // }
+
+
+    //    res.json({ response: "Get->/game/join" })   //return 201 (ok) o (409(si falla) + body (error: "String")) (ultimo)
 });
 
 
+router.post('/join', async (req, res) => {    //<<<--- (pincode----username)
 
-router.head('/join', (req, res, next) => {  //<<--- validar username  (/:pincode/:username)
-    res.json({ response: "Get->/game/join" })   //return 201 (ok) o (409(si falla) + body (error: "String")) (ultimo)
-});
+    let actualGame = await Actualgames({ pin: req.body.pin })
+    if (actualGame.username.game_id == "") {
+        res.status(200).send("pincode not valid or game started") //falta posar e status correcte.
+    } else {
 
-
-router.post('/join', async (req, res) => {
-    let username = req.body.username
-    if (req.userId) {
-        await User.findById(req.userId, (err, resp) => { username = resp.username })
+        if (req.userId) {
+            Game.findByIdAndUpdate(actualGame.game_id, { $push: { users: req.userId } })
+        } else {
+            Game.findByIdAndUpdate(actualGame.game_id, {
+                $push: {
+                    noLogedUsers: req.body.username
+                }
+            })
+        }
+        res.status(200).send(actualGame.game_id);
     }
-
-     //<<<--- (pincode----username)
-    res.json({ response: "post ->/game/join" }) //(200 si ok) body  id de la sala (prioritari)
 });
 
 
