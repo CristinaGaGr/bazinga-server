@@ -3,8 +3,9 @@ const router = express.Router();
 const User = require('../models/user')
 const Jwt = require('jsonwebtoken')
 function validateEmail(email) {
-    const re = /[a-z0-9!#$%&'*+\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/g;
-    return re.test(email);
+    // const re = /[a-z0-9!#$%&'*+\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/g;
+    // return re.test(email);
+    return true;
 }
 
 
@@ -17,7 +18,7 @@ router.get('/', function (req, res, next) {
     });
 });
 
-router.post('/me', (req, res, next) => {
+router.get('/me', (req, res, next) => {
     if (req.userId) {
         User.findById(req.userId, (err, response) => {
             let { username, email } = response;
@@ -30,7 +31,7 @@ router.post('/me', (req, res, next) => {
 });
 
 
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', async (req, res) => {
     let { username, password, repeatPassword, email } = req.body;
     let error = {
         response: [],
