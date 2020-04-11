@@ -3,11 +3,10 @@
 /**
  * Module dependencies.
  */
-
-const app = require('../App');
+const {app, server} = require('../App');
 const debug = require('debug')('express-generator-test:server');
-const http = require('http');
 // const io = require("socket.io")(http)
+
 
 /**
  * Get port from environment and store in Express.
@@ -15,37 +14,6 @@ const http = require('http');
 
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
-
-/**
- * Create HTTP server.
- */
-
-const server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-const socketIo = require("socket.io");
-
-
-const io = socketIo(server); // < Interesting!
-
-const getApiAndEmit = async socket => {
-  try {
-    socket.emit("FromAPI", 'hi'); // Emitting a new message. It will be consumed by the client
-  } catch (error) {
-    console.error(`Error: ${error.code}`);
-  }
-};
-
-
-io.on("connection", socket => {
-  console.log("New client connected"), setInterval(
-      () => getApiAndEmit(socket),
-      10000
-  );
-  socket.on("disconnect", () => console.log("Client disconnected"));
-});
 
 
 
