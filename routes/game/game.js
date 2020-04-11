@@ -36,19 +36,18 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
         arrayQuestions.splice(position, 1)
     }
     return (selectedQuestions)
-}
+};
 
 
 
 router.post('/', async (req, res) => {
-    let { username, dificulty, categories, numberOfQuestions } = req.body
-    categories = JSON.parse(categories)
-    let arrayQuestions = await questionGenerator(numberOfQuestions, dificulty, categories)
-    let { pin, game_id } = await pinGenerator()
+    const { username, difficulty, categories, numberOfQuestions } = req.body;
+    const arrayQuestions = await questionGenerator(numberOfQuestions, difficulty, categories);
+    const { pin, game_id } = await pinGenerator();
     if (req.userId === null) {
         await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, unloggedOwner: username })
     } else {
-        await User.findById(req.userId, (err, resp) => { username = resp.username })
+        await User.findById(req.userId, (err, resp) => { username = resp.username });
         await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, owner: req.userId })
     }
 
