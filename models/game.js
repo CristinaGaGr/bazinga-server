@@ -5,6 +5,7 @@ const gameSchema = new Schema({
     users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     noLogedUsers:[],
     owner: { type: Schema.Types.ObjectId, ref: 'User' },
+    unloggedOwner:String,
     status: { type: String, default: 'wating to users' },
     gameStarted: { type: Boolean, default: false },
     questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
