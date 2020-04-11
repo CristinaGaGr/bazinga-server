@@ -20,9 +20,7 @@ const pinGenerator = async () => {
     }
     return { pin, game_id }
 }
-const addToGame = () => {
 
-}
 
 const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
     let arrayQuestions = []
@@ -80,10 +78,5 @@ router.post('/join', async (req, res) => {    //<<<--- (pincode----username)
         res.status(200).send(actualGame.game_id);
     }
 });
-
-
-
-
-
 
 module.exports = router;
