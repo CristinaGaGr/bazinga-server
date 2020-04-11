@@ -13,7 +13,7 @@ const setCookie = (res, user) => {
     const token = Jwt.sign({ _id: user._id }, process.env.PRIVATEKEY, { expiresIn: '12h' });
     res.cookie('bazinga', token, {
         maxAge: 43200000,
-        httpOnly: true,
+        httpOnly: false,
         secure: false
     });
 };
