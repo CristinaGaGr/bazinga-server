@@ -41,15 +41,18 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
 
 
 router.post('/', async (req, res) => {
+
+    console.log("generating game")
     const { username, difficulty, categories, numberOfQuestions } = req.body;
     const arrayQuestions = await questionGenerator(numberOfQuestions, difficulty, categories);
     const { pin, game_id } = await pinGenerator();
     if (req.userId === null) {
-        await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, unloggedOwner: username })
+        await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, nologgedOwner: username })
     } else {
         await User.findById(req.userId, (err, resp) => { username = resp.username });
         await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, owner: req.userId })
     }
+    console.log("game generated")
 
     res.send({ pin, game_id }) //respondo con la info y despues actualizo el modelo de forma asyncrona
 });

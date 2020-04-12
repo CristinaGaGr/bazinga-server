@@ -59,7 +59,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 const server = http.createServer(app);
 
 const io = require('socket.io')(server);
-require('./socket.js')(io);
+require('./socket.js').connection(io);
 
 
 const indexRouter = require('./routes/index')(io);
