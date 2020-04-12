@@ -43,7 +43,7 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
 router.post('/', async (req, res) => {
 
     console.log("generating game")
-    const { username, difficulty, categories, numberOfQuestions } = req.body;
+    let { username, difficulty, categories, numberOfQuestions } = req.body;
     const arrayQuestions = await questionGenerator(numberOfQuestions, difficulty, categories);
     const { pin, game_id } = await pinGenerator();
     if (req.userId === null) {
