@@ -7,12 +7,7 @@ module.exports = (io) => {
     router.get('/me', (req, res, next) => {
         if (req.userId) {
             User.findById(req.userId, (err, response) => {
-                let { username, email } = response;
-                res.send(username);
-                io.emit('FromAPI', 'FROM ME');
-                setTimeout(() => {
-                    io.emit('FromAPI', 'SECOND ROUND');
-                }, 1000);
+                res.send({ username: response.username, id: response._id });
             })
         } else {
             res.send(null)

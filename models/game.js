@@ -8,8 +8,16 @@ const gameSchema = new Schema({
     nologgedOwner:String,
     gameStarted: { type: Boolean, default: false },
     questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
+    ranking: [{ user: String, score:Number}],
     questionNumber: { type: Number, default: 0 },
-    results: [{ type: Schema.Types.ObjectId, ref: 'responses' }]
+    results: [{
+        user: String,//{ type: Schema.Types.ObjectId, ref: 'User' },
+        question: { type: Schema.Types.ObjectId, ref: 'Question' },
+        responseTime: Number,
+        answer: String,
+        points:Number
+    }]
+
 });
 
 const Game = mongoose.model('game', gameSchema);

@@ -1,12 +1,21 @@
 const Game = require('../../models/game')
 const Actualgames = require("../../models/actual")
-const Questions = require('../../models/questions')
-const randomizer = (correct, incorrects) => {
+const questions = require('../../models/questions')
+const valueCorrect = 2000
+const maxResponseTime = 20000
+
+
+const calculateAnswerScore = (time) => {
+    return (Math.floor(valueCorrect - valueCorrect / maxResponseTime * (maxResponseTime - time)))
+}
+valueTime = valueCorrect - valueCorrect / maxResponseTime * 100
+
+const randomOrderOfquestions = (correct, incorrects) => {
     let array = []
     let count = 0
-    let ok = Math.floor(Math.random() * incorrects.length + 1)
+    let positionOfCorrcetAnswer = Math.floor(Math.random() * incorrects.length + 1)
     for (let i = 0; i < 4; i++) {
-        if (i === ok) {
+        if (i === positionOfCorrcetAnswer) {
             array.push(correct)
         } else {
             array.push(incorrects[count])
@@ -16,50 +25,91 @@ const randomizer = (correct, incorrects) => {
     }
     return array
 }
+const getNextCuestion = async (questionId, questionNumber, totalquestions) => {
+    let response = { category: "", type: "", question: "", options: "", id: "", questionNumber: questionNumber + 1, totalquestions: totalquestions + 1 }
+
+    await questions.findById(questionId, async (err, questionsResponse) => {
+        let mixedAnswers
+        if (questionsResponse.type === "multiple") {
+            mixedAnswers = await randomOrderOfquestions(questionsResponse.correct_answer, questionsResponse.incorrect_answers)
+        } else {
+            mixedAnswers = [questionsResponse.correct_answer, questionsResponse.incorrect_answers[0]]
+        }
+        response.category = questionsResponse.category
+        response.type = questionsResponse.type
+        response.question = questionsResponse.question
+        response.options = mixedAnswers
+        response.id = questionsResponse._id
+    })
+    return response
+}
+
+const checkCorrectAnswer = async (questionId, answer) => {
+    let correct = false
+    await questions.findById(questionId, async (err, questionsResponse) => {
+        if (answer === questionsResponse.correct_answer) {
+            correct = true
+        }
+    })
+    return correct
+}
+
 
 const startListener = (io) => {
 
     io.on("/hello", (gameId, user) => {
-        console.log(user)
         io.username = user
         io.join(gameId)
         io.room = gameId
-        Game.findByIdAndUpdate(gameId, { $push: { noLogedUsers: user } }, {new:true},(err,res) => { 
-            io.emit('/user', res.noLogedUsers)
-                    //nose como cojer la cookie!
+        if (io.numberOfUsers === undefined) {
+            io.numberOfUsers = 0
+        } else {
+            io.numberOfUsers++
+        }
+        io.numberOfUsers = io.numberOfUsers + 1
+        Game.findByIdAndUpdate(gameId, { $push: { noLogedUsers: user } }, { new: true }, (err, gameResponse) => {
+            io.emit('/user', gameResponse.noLogedUsers)
+            //nose como cojer la cookie!
 
-                //falta incluir los usuarios logeados. 
+            //falta incluir los usuarios logeados. 
         })
-      
+
     })
 
-    io.on("/start", (gameId) => {
-        console.log("start", gameId)
-        Game.findByIdAndUpdate(gameId, { gameStarted: true }, (err, res) => {
-            console.log(res)
-            Questions.findById(res.questions[res.questionNumber], async(err, resp) => {  
-                console.log(resp)
-                let mixedAnswers 
-                if  (resp.type==="multiple") {
-                    mixedAnswers = await randomizer(resp.correct_answer, resp.incorrect_answers)
-                }else{
-                    mixedAnswers = [resp.correct_answer, resp.incorrect_answers]
-                }
-                console.log({category:resp.category,type:resp.type,question:resp.question,options:mixedAnswers})
-                io.emit('/question', {category:resp.category,type:resp.type,question:resp.question,options:mixedAnswers})
-            })
+    io.on("/start", () => {
+        Actualgames.findOneAndDelete({ game_id: io.room }, (err, res) => {
+            console.log(err, res)
+        })
+        Game.findById(io.room, async (err, gameResponse) => {
+            let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
+            io.emit('/question', response)
 
         })
 
     })
 
+    io.on("/answer", (questionId, answer, time) => {
+        let points = 0
+        if (checkCorrectAnswer(questionId, answer)) {
+            points = calculateAnswerScore(time)
+        }
+        let results = { user: io.username, question: questionId, responseTime: time, answer: answer, points: points }
+        Game.findByIdAndUpdate(io.room, { $inc: { questionNumber: 1 }, $push: { results: results } }, { new: true }, async (err, gameResponse) => {
+            console.log(gameResponse.questionNumber, gameResponse.questions.length)
+            if (gameResponse.questionNumber !== gameResponse.questions.length) {
+                let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
+                io.emit('/question', response)
 
+            } else {
+                console.log("game end")
+            }
 
+        })
 
-
+    })
 
 }
 
 module.exports = {
-    startListener
-}
+            startListener
+        }
