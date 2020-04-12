@@ -61,12 +61,14 @@ const startListener = (io) => {
         io.username = user
         io.join(gameId)
         io.room = gameId
+        console.log(io.room)
         if (io.numberOfUsers === undefined) {
             io.numberOfUsers = 0
         } else {
             io.numberOfUsers++
         }
         io.numberOfUsers = io.numberOfUsers + 1
+        io.recivedAnswers =0
         Game.findByIdAndUpdate(gameId, { $push: { noLogedUsers: user } }, { new: true }, (err, gameResponse) => {
             io.emit('/user', gameResponse.noLogedUsers)
             //nose como cojer la cookie!
@@ -77,6 +79,9 @@ const startListener = (io) => {
     })
 
     io.on("/start", () => {
+        console.log("number of users-->",io.numberOfUsers)
+        console.log("recived answers-->",io.recivedAnswers)
+
         Actualgames.findOneAndDelete({ game_id: io.room }, (err, res) => {
             console.log(err, res)
         })
@@ -90,12 +95,21 @@ const startListener = (io) => {
 
     io.on("/answer", (questionId, answer, time) => {
         let points = 0
+        io.recivedAnswers++
+        console.log(io.numberOfUsers)
+        console.log(io.recivedAnswers)
+
         if (checkCorrectAnswer(questionId, answer)) {
             points = calculateAnswerScore(time)
         }
+        if (io.recivedAnswers === io.numberOfUsers) {
+            console.log("all answers recived sending response ")
+            io.recivedAnswers= 0
+        }
+        let ranking = { user: io.username, }
         let results = { user: io.username, question: questionId, responseTime: time, answer: answer, points: points }
         Game.findByIdAndUpdate(io.room, { $inc: { questionNumber: 1 }, $push: { results: results } }, { new: true }, async (err, gameResponse) => {
-            console.log(gameResponse.questionNumber, gameResponse.questions.length)
+          //  console.log(gameResponse.questionNumber, gameResponse.questions.length)
             if (gameResponse.questionNumber !== gameResponse.questions.length) {
                 let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
                 io.emit('/question', response)

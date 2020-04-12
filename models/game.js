@@ -24,3 +24,4 @@ const Game = mongoose.model('game', gameSchema);
 
 module.exports = Game;
 //uml
+{ ranking: { } }

@@ -7,7 +7,7 @@ module.exports = (io) => {
     router.get('/me', (req, res, next) => {
         if (req.userId) {
             User.findById(req.userId, (err, response) => {
-                res.send({ username: response.username, id: response._id });
+                res.send({ username: response.username, _id: response._id });
             })
         } else {
             res.send(null)
