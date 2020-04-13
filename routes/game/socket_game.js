@@ -161,32 +161,32 @@ console.log(error)
     socket.on("/answer", async (questionId, answer, time) => {
         try {
 
-            const CurrentGame = await Game.findById(socket.room);
+            const currentGame = await Game.findById(socket.room);
             let ranking
             let points = 0
             socket.recivedAnswers++
             if (await checkCorrectAnswer(questionId, answer)) {
                 points = calculateAnswerScore(time)
             }
-            if (CurrentGame.ranking.findIndex(obj => obj.user === socket.username.username) === -1) {
+            if (currentGame.ranking.findIndex(obj => obj.user === socket.username.username) === -1) {
                 ranking = { user: socket.username.username, score: points }
-                CurrentGame.ranking.push(ranking)
+                currentGame.ranking.push(ranking)
             } else {
-                CurrentGame.ranking[CurrentGame.ranking.findIndex(obj => obj.user === socket.username.username)].score += points
+                currentGame.ranking[currentGame.ranking.findIndex(obj => obj.user === socket.username.username)].score += points
             }
-            await CurrentGame.save();
+            await currentGame.save();
             let savedAnswer = { user: socket.username, question: questionId, responseTime: time, answer: answer, points: points }
             console.log(socket.numberOfUsers)
             if (socket.recivedAnswers >= socket.numberOfUsers) {
                 io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
-                io.sockets.to(socket.room).emit("/ranking", CurrentGame.ranking)
+                io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
                 socket.recivedAnswers = 0
 
             } else {
                 console.log("answer recived waiting all user answer")
             }
-            CurrentGame.savedAnswer.push(savedAnswer)
-            await CurrentGame.save()
+            currentGame.savedAnswer.push(savedAnswer)
+            await currentGame.save()
         } catch (error) {
             console.log(error)
 
