@@ -1,7 +1,7 @@
 const Game = require('../../models/game')
 const Actualgames = require("../../models/actual")
 const questions = require('../../models/questions')
-const valueCorrect = 2000
+const valueCorrect = 10000
 const maxResponseTime = 10000
 
 
@@ -32,7 +32,7 @@ const getNextCuestion = async (questionId, questionNumber, totalquestions) => {
 
 
 	if (questionsResponse.type === "multiple") {
-		mixedAnswers = await randomOrderOfquestions(questionsResponse.correct_answer, questionsResponse.incorrect_answers)
+		mixedAnswers = randomOrderOfquestions(questionsResponse.correct_answer, questionsResponse.incorrect_answers)
 
 	} else {
 		mixedAnswers = [questionsResponse.correct_answer, questionsResponse.incorrect_answers[0]]
@@ -128,7 +128,6 @@ const startListener = (socket, io) => {
 
 	socket.on("/new-question", () => {
 		try {
-			console.log("newQuestion")
 			socket.recivedAnswers++
 			socket.recivedAnswers = 0
 			Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
