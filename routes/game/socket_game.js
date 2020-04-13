@@ -70,7 +70,7 @@ const startListener = (socket, io) => {
         socket.on("/hello", (gameId, user) => {
             if (gameId !== null && user !== null) {
 
-                socket.username = user
+                socket.user = user
                 socket.join(gameId)
                 socket.room = gameId
                 if (socket.numberOfUsers === undefined) {
@@ -168,16 +168,16 @@ console.log(error)
             if (await checkCorrectAnswer(questionId, answer)) {
                 points = calculateAnswerScore(time)
             }
-            if (currentGame.ranking.findIndex(obj => obj.user === socket.username.username) === -1) {
-                ranking = { user: socket.username.username, score: points }
+            if (currentGame.ranking.findIndex(obj => obj.user === socket.user.username) === -1) {
+                ranking = { user: socket.user.username, score: points }
                 currentGame.ranking.push(ranking)
             } else {
-                currentGame.ranking[currentGame.ranking.findIndex(obj => obj.user === socket.username.username)].score += points
+                currentGame.ranking[currentGame.ranking.findIndex(obj => obj.user === socket.user.username)].score += points
             }
             await currentGame.save();
-            let savedAnswer = { user: socket.username, question: questionId, responseTime: time, answer: answer, points: points }
-            console.log(socket.numberOfUsers)
-            if (socket.recivedAnswers >= socket.numberOfUsers) {
+            let savedAnswer = { user: socket.user, question: questionId, responseTime: time, answer: answer, points: points }
+            console.log(socket.numberOfUsers,socket.recivedAnswers)
+            if (socket.recivedAnswers === socket.numberOfUsers) {
                 io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
                 io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
                 socket.recivedAnswers = 0
