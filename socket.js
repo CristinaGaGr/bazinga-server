@@ -4,7 +4,7 @@ const socketGame = require('./routes/game/socket_game')
 const connection = (io) => {
 	io.on('connection', socket => {
 		socketGame.startListener(socket,io)
-		console.log('New client connected');
+		console.log('New user connected');
 		socket.on('disconnect', () => { 
 			try {
 				
@@ -12,7 +12,7 @@ const connection = (io) => {
 			} catch (error) {
 				
 			}
-			console.log('Client disconnected from',socket.room,socket.username,socket.numberOfUsers );
+			console.log('User disconnected');
 		})
 		
 	});

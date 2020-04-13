@@ -66,7 +66,6 @@ const checkCorrectAnswer = async (questionId, answer) => {
 
 const startListener = (socket, io) => {
 	try {
-
 		if (io.sockets.actualGame === undefined) {
 			io.sockets.actualGame = {}
 		}
@@ -175,16 +174,12 @@ const startListener = (socket, io) => {
 				io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
 				io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
 				io.sockets.actualGame[socket.room].numberOfAnswers = 0
-
-
-
-
-
-
-
-
-
-				
+				if (currentGame.game.questionNumber === currentGame.questions.length) {
+					setTimeout(() => {
+						console.log()
+						delete io.sockets.actualGame[socket.room]	
+					}, 1000*60);
+				}
 			} else {
 				console.log("answer recived waiting all user answer")
 			}
