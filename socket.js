@@ -6,7 +6,12 @@ const connection = (io) => {
 		socketGame.startListener(socket,io)
 		console.log('New client connected');
 		socket.on('disconnect', () => { 
-			socket.numberOfUsers -= 1
+			try {
+				
+				io.sockets.actualGame[socket.room].numberOfPlayersAtRoom--
+			} catch (error) {
+				
+			}
 			console.log('Client disconnected from',socket.room,socket.username,socket.numberOfUsers );
 		})
 		

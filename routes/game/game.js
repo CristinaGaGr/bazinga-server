@@ -15,7 +15,6 @@ const pinGenerator = async () => {
         await Actualgames.create({ pin, game_id })
 
     } else {
-        //apartir de 7000 salas va EXTREMADAMENTE LENTO... NOSE SI SERIA MEJOR BAJARME TODO EL ARRAY EN LOCAL I HACER LA VALIDACION LOCALMENTE. 
         return pinGenerator()
     }
     return { pin, game_id }
@@ -53,14 +52,14 @@ router.post('/', async (req, res) => {
         })
         console.log("cleaning unstarted game..",game_id)
     }, 30*60*1000); 
-    res.send({ pin, game_id }) //respondo con la info y despues actualizo el modelo de forma asyncrona
+    res.send({ pin, game_id }) 
 });
 
 
 
 
 
-router.post('/join', async (req, res) => {    //<<<--- (pincode----username)
+router.post('/join', async (req, res) => {   
 
     let actualGame = await Actualgames.findOne({ pin: +req.body.pin });
     if (actualGame.game_id.id === "") {
