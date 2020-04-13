@@ -76,11 +76,8 @@ router.post('/signin', (req, res) => {
     User.findOne({ username }, (err, respUser) => {
         if (err) throw err;
         if (respUser === null) {
-            res.json(
-                {
-                    error: "User not exist"
-                }
-            )
+            res.status(401).send({ error: "No valid password", login: false });
+
         } else {
             respUser.comparePassword(password, function (err, isMatch) {
                 if (err) throw err;

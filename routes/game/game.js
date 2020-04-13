@@ -48,7 +48,11 @@ router.post('/', async (req, res) => {
         await User.findById(req.userId, (err, resp) => { username = resp.username });
         await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, owner: username })
     }
-
+    setTimeout(() => {
+        Actualgames.findOneAndDelete({ game_id}, (err, res) => {
+        })
+        console.log("cleaning unstarted game..",game_id)
+    }, 30*60*1000); 
     res.send({ pin, game_id }) //respondo con la info y despues actualizo el modelo de forma asyncrona
 });
 
