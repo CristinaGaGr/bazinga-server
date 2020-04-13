@@ -76,9 +76,11 @@ const startListener = (socket, io) => {
             console.log(socket.room, user)
             if (socket.numberOfUsers === undefined) {
                 socket.numberOfUsers = 1
-                console.log("user number 1")
+                console.log("user number 1", socket.numberOfUsers,"at room",socket.room)
             } else {
                 socket.numberOfUsers++
+                console.log("user number-->", socket.numberOfUsers,"at room",socket.room)
+
             }
             socket.recivedAnswers = 0
             Game.findByIdAndUpdate(gameId, { $push: { users: user } }, { new: true }, (err, gameResponse) => {
@@ -113,7 +115,7 @@ const startListener = (socket, io) => {
         Game.findById(socket.room, async (err, gameResponse) => {
             let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
             console.log(response)
-            io.sockets.to(socket.room).emit('/question', response)
+            io.sockets.to(socket.room).in(socket.room).emit('/question', response)
 
         })
 
@@ -124,22 +126,13 @@ const startListener = (socket, io) => {
         socket.recivedAnswers++
         if (socket.recivedAnswers === socket.numberOfUsers) {
             socket.recivedAnswers0
-
             Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
                     let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
                     io.sockets.to(socket.room).in(socket.room).emit('/question', response)
 
                 if (gameResponse.questionNumber === gameResponse.questions.length) {
-                        setTimeout(() => {
-                            io.sockets.clients(socket.room).forEach(function (s) {
-                                s.leave(socket.room);
-                            });  
-                        }, 10000);
+                    console.log("endgame")
                     }
-              
-                    //se supone que elimina de socket a todos los usuarios de esta room
-                
-                
 
             })
         }
@@ -150,6 +143,7 @@ const startListener = (socket, io) => {
 
 
     socket.on("/answer", async (questionId, answer, time) => {
+        console.log("answer recived")
         const CurrentGame = await Game.findById(socket.room);
         let ranking
         let points = 0
@@ -177,7 +171,6 @@ const startListener = (socket, io) => {
         }
         CurrentGame.savedAnswer.push(savedAnswer)
         await CurrentGame.save()
-       // Game.findByIdAndUpdate(socket.room, { savedAnswer: savedAnswer })
 
        })
 
