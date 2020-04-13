@@ -68,23 +68,41 @@ const checkCorrectAnswer = async (questionId, answer) => {
 const startListener = (socket, io) => {
 
     socket.on("/hello", (gameId, user) => {
-        socket.username = user
-        socket.join(gameId)
-        socket.room = gameId
-        console.log(socket.room, user)
-        if (socket.numberOfUsers === undefined) {
-            socket.numberOfUsers = 1
-            console.log("user number 1")
-        } else { 
-            socket.numberOfUsers++
-        }
-        socket.recivedAnswers = 0
-        Game.findByIdAndUpdate(gameId, { $push: { noLogedUsers: user.username } }, { new: true }, (err, gameResponse) => {
-            io.sockets.to(socket.room).emit('/user', gameResponse.noLogedUsers)
-            //nose como cojer la cookie!
+        if (gameId !== null && user !== null) {
 
-            //falta incluir los usuarios logeados. 
-        })
+            socket.username = user
+            socket.join(gameId)
+            socket.room = gameId
+            console.log(socket.room, user)
+            if (socket.numberOfUsers === undefined) {
+                socket.numberOfUsers = 1
+                console.log("user number 1")
+            } else {
+                socket.numberOfUsers++
+            }
+            socket.recivedAnswers = 0
+            Game.findByIdAndUpdate(gameId, { $push: { users: user } }, { new: true }, (err, gameResponse) => {
+                if (err) throw err;
+                if (gameResponse !== null) {
+                    console.log(gameResponse)
+                    let UsersArray = []
+                    gameResponse.users.forEach(element => {
+                        UsersArray.push(element.username)
+                    })
+                    console.log(UsersArray)
+                    io.sockets.to(socket.room).emit('/user', UsersArray)
+                    //nose como cojer la cookie! 
+
+                    //falta incluir los usuarios logeados.
+
+                } else {
+                    io.sockets.to(socket.room).emit('/user', [""])
+
+                }
+            })
+        } else {
+            console.log("recived null username or gameId")
+        }
 
     })
 
@@ -101,13 +119,40 @@ const startListener = (socket, io) => {
 
     })
 
+
+    socket.on("/new-question", () => {
+        socket.recivedAnswers++
+        if (socket.recivedAnswers === socket.numberOfUsers) {
+            socket.recivedAnswers0
+
+            Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
+                if (gameResponse.questionNumber !== gameResponse.questions.length) {
+                    let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
+                    io.sockets.to(socket.room).in(socket.room).emit('/question', response)
+                    
+                } else {
+                    console.log("game end")
+
+
+                    //se supone que elimina de socket a todos los usuarios de esta room
+                    io.sockets.clients(socket.room).forEach(function (s) {
+                        s.leave(socket.room);
+                    });
+                }
+
+            })
+        }
+
+    })
+
+
+
+
     socket.on("/answer", async (questionId, answer, time) => {
         const CurrentGame = await Game.findById(socket.room);
         let ranking
         let points = 0
         socket.recivedAnswers++
-        console.log(socket.numberOfUsers)
-        console.log(socket.recivedAnswers)
         if (await checkCorrectAnswer(questionId, answer)) {
             points = calculateAnswerScore(time)
         }
@@ -125,26 +170,13 @@ const startListener = (socket, io) => {
             io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
             io.sockets.to(socket.room).emit("/ranking", CurrentGame.ranking)
             socket.recivedAnswers = 0
-            Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 }, $push: { results: results } }, { new: true }, async (err, gameResponse) => {
-                if (gameResponse.questionNumber !== gameResponse.questions.length) {
-                    let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
-                    io.sockets.to(socket.room).in(socket.room).emit('/question', response)
-
-                } else {
-                    console.log("game end")
-                    io.sockets.clients(socket.room).forEach(function(s){
-                        s.leave(socket.room);
-                    });
-                }
-
-            })
+           
         } else {
             console.log("answer recived waiting all user answer")
-            Game.findByIdAndUpdate(socket.room, { results: results })
         }
+        Game.findByIdAndUpdate(socket.room, { results: results })
 
-
-    })
+       })
 
 }
 

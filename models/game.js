@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const gameSchema = new Schema({
-    users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    noLogedUsers:[{type: String}],
+    users: [{ _id: {type: Schema.Types.ObjectId, ref: 'User'},username: String}],
     owner: { type: Schema.Types.ObjectId, ref: 'User' },
     nologgedOwner:String,
     gameStarted: { type: Boolean, default: false },
