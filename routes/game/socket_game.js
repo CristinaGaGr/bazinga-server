@@ -102,7 +102,6 @@ const startListener = (socket, io) => {
     })
 
     socket.on("/answer", async (questionId, answer, time) => {
-    
         const CurrentGame = await Game.findById(socket.room);
         let ranking
         let points = 0
@@ -125,9 +124,7 @@ const startListener = (socket, io) => {
             console.log("all answers recived sending response ")
             io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
             io.sockets.to(socket.room).emit("/ranking", CurrentGame.ranking)
-            console.log(socket.recivedAnswers)
             socket.recivedAnswers = 0
-            console.log(socket.recivedAnswers)
             Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 }, $push: { results: results } }, { new: true }, async (err, gameResponse) => {
                 if (gameResponse.questionNumber !== gameResponse.questions.length) {
                     let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
@@ -135,6 +132,9 @@ const startListener = (socket, io) => {
 
                 } else {
                     console.log("game end")
+                    io.sockets.clients(socket.room).forEach(function(s){
+                        s.leave(socket.room);
+                    });
                 }
 
             })
