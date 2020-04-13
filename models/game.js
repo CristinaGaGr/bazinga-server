@@ -3,14 +3,12 @@ const Schema = mongoose.Schema;
 
 const gameSchema = new Schema({
     users: [{ _id: {type: Schema.Types.ObjectId, ref: 'User'},username: String}],
-    owner: { type: Schema.Types.ObjectId, ref: 'User' },
-    nologgedOwner:String,
-    gameStarted: { type: Boolean, default: false },
+    owner: { _id: {type: Schema.Types.ObjectId, ref: 'User'},username: String},
     questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
     ranking: [{ user: String, score:Number}],
     questionNumber: { type: Number, default: 0 },
-    results: [{
-        user: String,//{ type: Schema.Types.ObjectId, ref: 'User' },
+    savedAnswer: [{
+        user: { _id: {type: Schema.Types.ObjectId, ref: 'User'},username: String},//{ type: Schema.Types.ObjectId, ref: 'User' },
         question: { type: Schema.Types.ObjectId, ref: 'Question' },
         responseTime: Number,
         answer: String,

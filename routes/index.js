@@ -6,7 +6,7 @@ const User = require('../models/user');
 module.exports = (io) => {
     router.get('/me', (req, res, next) => {
         if (req.userId) {
-            User.findById(req.userId, (err, response) => {
+            User.findById(req.userId._id, (err, response) => {
                 res.send({ username: response.username, _id: response._id });
             })
         } else {
