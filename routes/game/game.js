@@ -48,22 +48,22 @@ router.post('/', async (req, res) => {
         await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, owner: username })
     }
     setTimeout(() => {
-        Actualgames.findOneAndDelete({ game_id}, (err, res) => {
+        Actualgames.findOneAndDelete({ game_id }, (err, res) => {
         })
-        console.log("cleaning unstarted game..",game_id)
-    }, 30*60*1000); 
-    res.send({ pin, game_id }) 
+        console.log("cleaning unstarted game..", game_id)
+    }, 30 * 60 * 1000);
+    res.send({ pin, game_id })
 });
 
 
 
 
 
-router.post('/join', async (req, res) => {   
+router.post('/join', async (req, res) => {
 
     let actualGame = await Actualgames.findOne({ pin: +req.body.pin });
     if (actualGame.game_id.id === "") {
-        res.status(404).send("pincode not valid or game started") //falta posar e status correcte.
+        res.status(404).send("pincode not valid or game started")
     } else {
 
         if (req.userId) {
@@ -78,5 +78,28 @@ router.post('/join', async (req, res) => {
         res.status(200).send(actualGame.game_id);
     }
 });
+
+
+router.get('/check', (req, res) => {
+    let { username, pin } = req.query
+    try {
+
+        Actualgames.findOne({ pin }).populate('game_id').exec((err, actualGame) => {
+            if (err) {
+                res.status(400).send("Invalid Pin")
+                console.log(err)
+            }
+            if (actualGame.game_id.users.findIndex(user => user.username === username) === -1) {
+                res.status(200).send()
+            } else {
+                res.status(400).send("Username in use")
+            }
+        })
+
+    } catch (error) {
+        console.log(error)
+        
+    }
+})
 
 module.exports = router;
