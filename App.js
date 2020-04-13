@@ -19,9 +19,7 @@ mongoose
 		useFindAndModify: false
 	})
 	.then(x => {
-		console.log(
-			`Connected to Mongo! Database name: "${x.connections[0].name}"`
-		);
+		console.log(`Connected to Mongo! Database name: ${x.connections[0].name}`	);
 	})
 	.catch(err => {
 		console.error('Error connecting to mongo', err);
@@ -58,7 +56,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 const server = http.createServer(app);
 
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {pingTimeout:4000,pingInterval:1000});
 require('./socket.js').connection(io);
 
 

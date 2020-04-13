@@ -11,7 +11,7 @@ function validateEmail(email) {
 
 const setCookie = (res, user) => {
     const token = Jwt.sign({ _id: user._id,username:user.username }, process.env.PRIVATEKEY, { expiresIn: '12h' });
-    console.log('sendingcookie')
+    ('sendingcookie')
     res.cookie('bazinga', token, {
         maxAge: 43200000,
         httpOnly: false,

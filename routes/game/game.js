@@ -26,9 +26,6 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
     let arrayQuestions = []
     let selectedQuestions = []
     arrayQuestions = await Questions.find({ category: categories, difficulty: dificulty }, { _id: 1 })
-    if (arrayQuestions.length < numberOfQuestions) {
-        console.log(`pending to complete ${numberOfQuestions - arrayQuestions.length} questions`)
-    }
     let numberResponseMongo = arrayQuestions.length
     for (let i = 0; i < numberOfQuestions - 1 && i < numberResponseMongo; i++) {
         let position = Math.floor(Math.random() * arrayQuestions.length)
@@ -42,18 +39,15 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
 
 router.post('/', async (req, res) => {
 
-    console.log("generating game")
     let { username, difficulty, categories, numberOfQuestions } = req.body;
-    console.log(req.body)
     const arrayQuestions = await questionGenerator(numberOfQuestions, difficulty, categories);
     const { pin, game_id } = await pinGenerator();
     if (req.userId === null) {
-        await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, owner: username })
+        await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, nologgedOwner: username })
     } else {
         await User.findById(req.userId, (err, resp) => { username = resp.username });
         await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, owner: username })
     }
-    console.log("game generated")
 
     res.send({ pin, game_id }) //respondo con la info y despues actualizo el modelo de forma asyncrona
 });
