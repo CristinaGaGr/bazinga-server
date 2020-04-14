@@ -1,14 +1,14 @@
 const Game = require('../../models/game')
 const Actualgames = require("../../models/actual")
 const questions = require('../../models/questions')
-const valueCorrect = 10000
-const maxResponseTime = 10000
+const valueCorrect = 1000 //
+const maxResponseTime = 10000 //<--- tottal 10s
 
 
 const calculateAnswerScore = (time) => {
-	return (Math.floor(valueCorrect - valueCorrect / maxResponseTime * (maxResponseTime - time)))
+	return Math.round(valueCorrect + valueCorrect * (1 - time / maxResponseTime))
 }
-valueTime = valueCorrect - valueCorrect / maxResponseTime * 100
+// valueTime = valueCorrect - valueCorrect / maxResponseTime * 100
 
 const randomOrderOfquestions = (correct, incorrects) => {
 	let array = []
@@ -29,6 +29,7 @@ const getNextCuestion = async (questionId, questionNumber, totalquestions) => {
 	let response = { category: "", type: "", question: "", options: "", id: "", questionNumber: questionNumber + 1, totalQuestions: totalquestions + 1 }
 	let questionResponse = await questions.findById(questionId)
 	let mixedAnswers
+	console.log(questionResponse.correct_answer)
 	if (questionResponse.type === "multiple") {
 		mixedAnswers = randomOrderOfquestions(questionResponse.correct_answer, questionResponse.incorrect_answers)
 
@@ -40,7 +41,6 @@ const getNextCuestion = async (questionId, questionNumber, totalquestions) => {
 	response.question = questionResponse.question
 	response.options = mixedAnswers
 	response.id = questionResponse._id
-
 	return response
 }
 const correctAnswer = async (questionId) => {
@@ -86,7 +86,7 @@ const startListener = (socket, io) => {
 							UsersArray.push(element.username)
 						})
 						io.sockets.to(socket.room).emit('/user', UsersArray)
-					} 
+					}
 				})
 			} else {
 				console.log("recived null username or gameId")
@@ -95,7 +95,7 @@ const startListener = (socket, io) => {
 
 		socket.on("/bye", (user) => {
 			socket.leave(socket.room)
-			Game.findByIdAndUpdate(gameId, { $pull: { users: user } }, { new: true }, (err, gameResponse) => {
+			Game.findByIdAndUpdate(socket.user, { $pull: { users: user } }, { new: true }, (err, gameResponse) => {
 				if (gameResponse !== null) {
 					let UsersArray = []
 					gameResponse.users.forEach(element => {
@@ -132,8 +132,9 @@ const startListener = (socket, io) => {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
 					io.sockets.actualGame[socket.room].waitingResponse = false
 					Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
-						if (gameResponse.questionNumber <= gameResponse.questions.length) {
-							let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber+1, gameResponse.questions.length)
+						console.log(gameResponse.questionNumber <= gameResponse.questions.length, gameResponse.questionNumber, gameResponse.questions.length)
+						if (gameResponse.questionNumber < gameResponse.questions.length) {
+							let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber + 1, gameResponse.questions.length, gameResponse.questionNumber)
 							io.sockets.to(socket.room).in(socket.room).emit('/question', response)
 						}
 					})
@@ -147,6 +148,7 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/answer", async (questionId, answer, time) => {
+			console.log(time,answer)
 			try {
 				io.sockets.actualGame[socket.room].numberOfAnswers++
 				const currentGame = await Game.findById(socket.room);
@@ -161,7 +163,6 @@ const startListener = (socket, io) => {
 				} else {
 					currentGame.ranking[currentGame.ranking.findIndex(obj => obj.user === socket.user.username)].score += points
 				}
-				await currentGame.save();
 				let savedAnswer = { user: socket.user, question: questionId, responseTime: time, answer: answer, points: points }
 				if (io.sockets.actualGame[socket.room].numberOfAnswers === io.sockets.actualGame[socket.room].numberOfPlayersAtRoom) {
 					io.sockets.actualGame[socket.room].waitingResponse = true
