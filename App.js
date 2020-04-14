@@ -56,7 +56,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 const server = http.createServer(app);
 
-const io = require('socket.io')(server,{})//), {pingTimeout:4000,pingInterval:1000});
+const io = require('socket.io')(server)//), {pingTimeout:4000,pingInterval:1000});
 require('./socket.js').connection(io);
 
 
