@@ -41,7 +41,7 @@ app.use(cookieParser());
 app.use(
 	cors({
 		credentials: true,
-		origin: '*:*' // <== this will be the URL of our React app (it will be running on port 3000)
+		//origin: '*:*' // <== this will be the URL of our React app (it will be running on port 3000)
 	})
 );
 app.use(bodyParser.json());
