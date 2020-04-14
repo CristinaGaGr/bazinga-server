@@ -43,16 +43,16 @@ router.post('/signup', async (req, res) => {
     let responsedb = await User.find({ username });
     if (responsedb.length !== 0) {
         error= true
-        res.status(401).send("Username alredy exists")
+        res.status(401).send({error: "Username alredy exists"})
     }
     if (!validateEmail(email)) {
         error= true
-        res.status(401).send("Email not valid")
+        res.status(401).send({error: "Email not valid"})
     }
 
     if (password !== repeatPassword) {
         error= true
-        res.status(401).send("Confirm password fields are identical")
+        res.status(401).send({error: "Confirm password fields are identical"})
     }
 
     if (error === false) {
