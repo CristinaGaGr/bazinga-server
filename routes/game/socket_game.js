@@ -138,8 +138,8 @@ const startListener = (socket, io) => {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
 					io.sockets.actualGame[socket.room].waitingResponse = false
 					Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
-						if (gameResponse.questionNumber !== gameResponse.questions.length) {
-							let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
+						if (gameResponse.questionNumber <= gameResponse.questions.length) {
+							let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber - 1], gameResponse.questionNumber, gameResponse.questions.length)
 							io.sockets.to(socket.room).in(socket.room).emit('/question', response)
 						}
 					})
