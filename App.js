@@ -39,10 +39,7 @@ app.use(logger('dev'));
 app.use(cookieParser());
 // ADD CORS SETTINGS HERE TO ALLOW CROSS-ORIGIN INTERACTION:
 app.use(
-	cors({
-		credentials: true,
-		//origin: '*:*' // <== this will be the URL of our React app (it will be running on port 3000)
-	})
+	cors()
 );
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
