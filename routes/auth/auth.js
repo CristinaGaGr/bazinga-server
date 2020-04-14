@@ -10,7 +10,7 @@ function validateEmail(email) {
 }
 
 const setCookie = (res, user) => {
-    const token = Jwt.sign({ _id: user._id,username:user.username }, process.env.PRIVATEKEY, { expiresIn: '12h' });
+    const token = Jwt.sign({ _id: user._id,username:user.username }, process.env.PRIVATEKEY, { expiresIn: '30d' });
     ('sendingcookie')
     res.cookie('bazinga', token, {
         maxAge: 43200000,
@@ -39,35 +39,28 @@ router.post('/delete', (req, res) => {
 
 router.post('/signup', async (req, res) => {
     let { username, password, repeatPassword, email } = req.body;
-    let error = {
-        response: [],
-        status: false
-    };
-
+    let error= false
     let responsedb = await User.find({ username });
     if (responsedb.length !== 0) {
-        error.status = true;
-        error.response.push("username exists")
+        error= true
+        res.status(401).send("Username alredy exists")
     }
     if (!validateEmail(email)) {
-        error.status = true;
-        error.response.push("Email are not valid")
-
+        error= true
+        res.status(401).send("Email not valid")
     }
 
     if (password !== repeatPassword) {
-        error.status = true;
-        error.response.push("Passwords are not identical")
+        error= true
+        res.status(401).send("Confirm password fields are identical")
     }
 
-    if (error.status === false) {
+    if (error === false) {
         User.create({ username: username, password, email }, (err, respUser) => {
             setCookie(res, respUser);
             res.json({ respUser, error })
         });
-    } else {
-        res.json(error)
-    }
+    } 
 });
 
 
@@ -83,9 +76,8 @@ router.post('/signin', (req, res) => {
                 if (err) throw err;
                 if (isMatch) {
                     setCookie(res, respUser);
-                    res.json({ respUser, login: true });
+                    res.status(200).json(respUser);
                 } else {
-                    //401
                     res.status(401).send({ error: "No valid password", login: false });
                 }
             });
