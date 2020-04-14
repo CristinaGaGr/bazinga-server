@@ -28,7 +28,7 @@ const randomOrderOfquestions = (correct, incorrects) => {
 const getNextCuestion = async (questionId, questionNumber, totalquestions) => {
 	let response = { category: "", type: "", question: "", options: "", id: "", questionNumber: questionNumber + 1, totalQuestions: totalquestions + 1 }
 	let questionResponse = await questions.findById(questionId)
-	let mixedAnswers	
+	let mixedAnswers
 	if (questionResponse.type === "multiple") {
 		mixedAnswers = randomOrderOfquestions(questionResponse.correct_answer, questionResponse.incorrect_answers)
 
@@ -73,7 +73,7 @@ const startListener = (socket, io) => {
 
 			if (gameId !== null && user !== null) {
 				if (io.sockets.actualGame[gameId] === undefined) {
-					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0 ,waitingResponse:true}
+					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true }
 				}
 				io.sockets.actualGame[gameId].numberOfPlayersAtRoom++
 				socket.user = user
@@ -100,7 +100,6 @@ const startListener = (socket, io) => {
 		})
 
 		socket.on("/bye", (user) => {
-
 			socket.leave(socket.room)
 			Game.findByIdAndUpdate(gameId, { $pull: { users: user } }, { new: true }, (err, gameResponse) => {
 				if (gameResponse !== null) {
@@ -109,11 +108,8 @@ const startListener = (socket, io) => {
 						UsersArray.push(element.username)
 					})
 					io.sockets.to(socket.room).emit('/user', UsersArray)
-
-
 				}
 			})
-
 		})
 
 
@@ -124,8 +120,7 @@ const startListener = (socket, io) => {
 				})
 				Game.findById(socket.room, async (err, gameResponse) => {
 					let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
-					io.sockets.actualGame[socket.room].waitingResponse=true
-
+					io.sockets.actualGame[socket.room].waitingResponse = true
 					io.sockets.to(socket.room).in(socket.room).emit('/question', response)
 
 				})
@@ -141,25 +136,16 @@ const startListener = (socket, io) => {
 
 			try {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
-					io.sockets.actualGame[socket.room].waitingResponse=false
-						console.log("/newQuestion")
+					io.sockets.actualGame[socket.room].waitingResponse = false
 					Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
-						console.log("questionnumber", gameResponse.questionNumber)
-						console.log("max cuestions",gameResponse.questions.length)
-							if (gameResponse.questionNumber !== gameResponse.questions.length) {
-								let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
-								io.sockets.to(socket.room).in(socket.room).emit('/question', response)
-		
-		
-							}
-		
-						})
-					
-				} 
-
+						if (gameResponse.questionNumber !== gameResponse.questions.length) {
+							let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
+							io.sockets.to(socket.room).in(socket.room).emit('/question', response)
+						}
+					})
+				}
 			} catch (error) {
 				console.log(error)
-
 			}
 
 		})
@@ -168,8 +154,6 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/answer", async (questionId, answer, time) => {
-			console.log("/answer")
-
 			try {
 				io.sockets.actualGame[socket.room].numberOfAnswers++
 				const currentGame = await Game.findById(socket.room);
@@ -190,8 +174,7 @@ const startListener = (socket, io) => {
 
 
 				if (io.sockets.actualGame[socket.room].numberOfAnswers === io.sockets.actualGame[socket.room].numberOfPlayersAtRoom) {
-					io.sockets.actualGame[socket.room].waitingResponse=true
-
+					io.sockets.actualGame[socket.room].waitingResponse = true
 					io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
 					io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
 					io.sockets.actualGame[socket.room].numberOfAnswers = 0
