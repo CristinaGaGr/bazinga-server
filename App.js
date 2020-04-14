@@ -39,11 +39,11 @@ app.use(logger('dev'));
 app.use(cookieParser());
 // ADD CORS SETTINGS HERE TO ALLOW CROSS-ORIGIN INTERACTION:
 app.use(
-	cors()
-	
+	cors({
+		credentials: true,
+		origin: [process.env.FRONT] // <== this will be the URL of our React app (it will be running on port 3000)
+	})
 );
-app.options('*', cors());
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -56,7 +56,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 const server = http.createServer(app);
 
-const io = require('socket.io')(server,{ origins:'*:*'})//), {pingTimeout:4000,pingInterval:1000});
+const io = require('socket.io')(server,{})//), {pingTimeout:4000,pingInterval:1000});
 require('./socket.js').connection(io);
 
 
