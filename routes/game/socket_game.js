@@ -26,7 +26,7 @@ const randomOrderOfquestions = (correct, incorrects) => {
 	return array
 }
 const getNextCuestion = async (questionId, questionNumber, totalquestions) => {
-	let response = { category: "", type: "", question: "", options: "", id: "", questionNumber: questionNumber + 1, totalquestions: totalquestions + 1 }
+	let response = { category: "", type: "", question: "", options: "", id: "", questionNumber: questionNumber + 1, totalQuestions: totalquestions + 1 }
 	let questionsResponse = await questions.findById(questionId)
 	let mixedAnswers
 
@@ -185,7 +185,7 @@ const startListener = (socket, io) => {
 					io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
 					io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
 					io.sockets.actualGame[socket.room].numberOfAnswers = 0
-					if (currentGame.game.questionNumber === currentGame.questions.length) {
+					if (currentGame.questionNumber === currentGame.questions.length) {
 						setTimeout(() => {
 							console.log()
 							delete io.sockets.actualGame[socket.room]
