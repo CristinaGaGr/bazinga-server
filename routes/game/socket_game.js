@@ -94,16 +94,21 @@ const startListener = (socket, io) => {
 		})
 
 		socket.on("/bye", (user) => {
-			socket.leave(socket.room)
-			Game.findByIdAndUpdate(socket.user, { $pull: { users: user } }, { new: true }, (err, gameResponse) => {
-				if (gameResponse !== null) {
-					let UsersArray = []
-					gameResponse.users.forEach(element => {
-						UsersArray.push(element.username)
-					})
-					io.sockets.to(socket.room).emit('/user', UsersArray)
-				}
-			})
+			try {
+				
+				socket.leave(socket.room)
+				Game.findByIdAndUpdate(socket.room, { $pull: { users: user } }, { new: true }, (err, gameResponse) => {
+					if (gameResponse !== null) {
+						let UsersArray = []
+						gameResponse.users.forEach(element => {
+							UsersArray.push(element.username)
+						})
+						io.sockets.to(socket.room).emit('/user', UsersArray)
+					}
+				})
+			} catch (error) {
+				console.error(error)
+			}
 		})
 
 
