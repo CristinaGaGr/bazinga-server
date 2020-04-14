@@ -40,6 +40,7 @@ app.use(cookieParser());
 // ADD CORS SETTINGS HERE TO ALLOW CROSS-ORIGIN INTERACTION:
 app.use(
 	cors()
+	
 );
 app.options('*', cors());
 
