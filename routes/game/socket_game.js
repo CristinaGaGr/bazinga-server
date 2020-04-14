@@ -70,7 +70,6 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/hello", (gameId, user) => {
-
 			if (gameId !== null && user !== null) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true }
@@ -87,16 +86,11 @@ const startListener = (socket, io) => {
 							UsersArray.push(element.username)
 						})
 						io.sockets.to(socket.room).emit('/user', UsersArray)
-
-					} else {
-						io.sockets.to(socket.room).emit('/user', [""])
-
-					}
+					} 
 				})
 			} else {
 				console.log("recived null username or gameId")
 			}
-
 		})
 
 		socket.on("/bye", (user) => {
@@ -120,6 +114,7 @@ const startListener = (socket, io) => {
 				})
 				Game.findById(socket.room, async (err, gameResponse) => {
 					let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
+					console.log(gameResponse.questionNumber)
 					io.sockets.actualGame[socket.room].waitingResponse = true
 					io.sockets.to(socket.room).in(socket.room).emit('/question', response)
 
@@ -133,13 +128,12 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/new-question", () => {
-
 			try {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
 					io.sockets.actualGame[socket.room].waitingResponse = false
 					Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
 						if (gameResponse.questionNumber <= gameResponse.questions.length) {
-							let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber - 1], gameResponse.questionNumber, gameResponse.questions.length)
+							let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber+1, gameResponse.questions.length)
 							io.sockets.to(socket.room).in(socket.room).emit('/question', response)
 						}
 					})
@@ -147,7 +141,6 @@ const startListener = (socket, io) => {
 			} catch (error) {
 				console.log(error)
 			}
-
 		})
 
 
@@ -170,9 +163,6 @@ const startListener = (socket, io) => {
 				}
 				await currentGame.save();
 				let savedAnswer = { user: socket.user, question: questionId, responseTime: time, answer: answer, points: points }
-
-
-
 				if (io.sockets.actualGame[socket.room].numberOfAnswers === io.sockets.actualGame[socket.room].numberOfPlayersAtRoom) {
 					io.sockets.actualGame[socket.room].waitingResponse = true
 					io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
@@ -191,9 +181,7 @@ const startListener = (socket, io) => {
 				await currentGame.save()
 			} catch (error) {
 				console.log(error)
-
 			}
-
 		})
 	} catch (error) {
 		console.log("socket error")
