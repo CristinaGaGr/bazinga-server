@@ -92,8 +92,8 @@ const startListener = (socket, io) => {
 			}
 		})
 
-		socket.on("/bye", (user,owner) => {
-			console.log("fjaslkd")
+		socket.on("/bye", (user, owner) => {
+			console.log("fjaslkd", owner)
 			try {
 				if (owner) {
 					console.log("isowner")
