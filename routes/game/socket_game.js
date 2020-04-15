@@ -79,7 +79,7 @@ const startListener = (socket, io) => {
 			}
 			console.log(socket.id, socket.room)
 			console.log(gameId,user)
-			if (!gameId && !user) {
+			if (gameId && user) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true }
 				}
