@@ -81,18 +81,17 @@ router.post('/join', async (req, res) => {
 
 
 router.get('/check', (req, res) => {
-    let { username, pin } = req.query
+    let { username, pin } = req.query;
     try {
-
         Actualgames.findOne({ pin }).populate('game_id').exec((err, actualGame) => {
-            if (err) {
-                res.status(400).send("Invalid Pin")
-                console.log(err)
+            if (err || !actualGame) {
+                res.status(403).send({error: "Invalid Pin"});
+                return;
             }
             if (actualGame.game_id.users.findIndex(user => user.username === username) === -1) {
                 res.status(200).send()
             } else {
-                res.status(400).send("Username in use")
+                res.status(403).send({error: "Username in use"});
             }
         })
 
