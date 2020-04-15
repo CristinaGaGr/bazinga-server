@@ -10,7 +10,7 @@ const connection = (io) => {
 		socket.on('disconnect', () => {
 			try {
 				io.sockets.actualGame[socket.room].numberOfPlayersAtRoom--
-				io.sockets.to(socket.room).emit("/answer", null, null, null, true);
+				io.sockets.in(socket.room).emit("/answer", null, null, null, true);
 		
 			
 			} catch (error) {
