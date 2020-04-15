@@ -187,12 +187,17 @@ const startListener = (socket, io) => {
 				if (await checkCorrectAnswer(questionId, answer)) {
 					points = calculateAnswerScore(time)
 				}
+				if (points > 0) {
+					console.log("filtering points")
+					points = 0
+				}
 				if (currentGame.ranking.findIndex(obj => obj.user === socket.user.username) === -1) {
 					ranking = { user: socket.user.username, score: points }
 					currentGame.ranking.push(ranking)
 				} else {
 					currentGame.ranking[currentGame.ranking.findIndex(obj => obj.user === socket.user.username)].score += points
 				}
+				console.log("responsetime:", time, "answer points:", points, "acumuled points:", currentGame.ranking[currentGame.ranking.findIndex(obj => obj.user === socket.user.username)].score)
 				let savedAnswer = { user: socket.user, question: questionId, responseTime: time, answer: answer, points: points }
 				if (io.sockets.actualGame[socket.room].numberOfAnswers === io.sockets.actualGame[socket.room].numberOfPlayersAtRoom) {
 					io.sockets.actualGame[socket.room].waitingResponse = true
