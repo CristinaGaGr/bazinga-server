@@ -97,8 +97,10 @@ const startListener = (socket, io) => {
 			try {
 				if (owner) {
 					console.log("isowner")
-					Game.find(socket.room, (game) => {
+					Game.find(socket.room, (err, game) => {
+						if (err) throw console.log(err)
 						if (game.questionNumber === 0) {
+							console.log("emit die")
 							io.sockets.to(socket.room).emit('/die')
 						}
 					})
