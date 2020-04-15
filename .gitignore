@@ -3,5 +3,5 @@
 package-lock.json
 .Thumbs.db
 /.vscode
-
+.env
 .idea/
