@@ -95,22 +95,33 @@ const startListener = (socket, io) => {
 		socket.on("/bye", (user, owner) => {
 			try {
 				if (owner) {
+					console.log("/bye owner")
 					Game.findById(socket.room, (err, game) => {
-						if (game.questionNumber === 0) {
-							console.log("emit die")
-							io.sockets.to(socket.room).emit('/die')
+						if (err) {
+							console.error(err)
+						} else {
+
+							if (game.questionNumber === 0) {
+								console.log("emit die")
+								io.sockets.to(socket.room).emit('/die')
+							}
 						}
 					})
 				} else {
 
 					socket.leave(socket.room)
 					Game.findByIdAndUpdate(socket.room, { $pull: { users: user } }, { new: true }, (err, gameResponse) => {
-						if (gameResponse !== null) {
-							let UsersArray = []
-							gameResponse.users.forEach(element => {
-								UsersArray.push(element.username)
-							})
-							io.sockets.to(socket.room).emit('/user', UsersArray)
+						if (err) {
+							console.error(err)
+						} else {
+							console.log("bye")
+							if (gameResponse !== null) {
+								let UsersArray = []
+								gameResponse.users.forEach(element => {
+									UsersArray.push(element.username)
+								})
+								io.sockets.to(socket.room).emit('/user', UsersArray)
+							}
 						}
 					})
 				}
@@ -124,12 +135,20 @@ const startListener = (socket, io) => {
 
 		socket.on("/start", () => {
 			try {
+				console.log("/start")
 				Actualgames.findOneAndDelete({ game_id: socket.room }, (err, res) => {
+					if (err) {
+						console.error(err)
+					}
 				})
 				Game.findById(socket.room, async (err, gameResponse) => {
-					let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
-					io.sockets.actualGame[socket.room].waitingResponse = true
-					io.sockets.to(socket.room).in(socket.room).emit('/question', response)
+					if (err) {
+						console.error(err)
+					} else {
+						let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
+						io.sockets.actualGame[socket.room].waitingResponse = true
+						io.sockets.to(socket.room).in(socket.room).emit('/question', response)
+					}
 
 				})
 			} catch (error) {
@@ -141,14 +160,13 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/new-question", () => {
+			console.log("sending new question")
 			try {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
 					io.sockets.actualGame[socket.room].waitingResponse = false
 					Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
-						//	if (gameResponse.questionNumber <= gameResponse.questions.length) {
 						let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length, gameResponse.questionNumber)
 						io.sockets.to(socket.room).in(socket.room).emit('/question', response)
-						//	}
 					})
 				}
 			} catch (error) {
@@ -160,6 +178,7 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/answer", async (questionId, answer, time) => {
+			console.log("recived answer")
 			try {
 				io.sockets.actualGame[socket.room].numberOfAnswers++
 				const currentGame = await Game.findById(socket.room);
