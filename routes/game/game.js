@@ -26,7 +26,7 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
     let selectedQuestions = []
     arrayQuestions = await Questions.find({ category: categories, difficulty: dificulty }, { _id: 1 })
     let numberResponseMongo = arrayQuestions.length
-    for (let i = 0; i < numberOfQuestions - 1 && i < numberResponseMongo; i++) {
+    for (let i = 0; i < numberOfQuestions  && i < numberResponseMongo; i++) {
         let position = Math.round(Math.random() * arrayQuestions.length)
         selectedQuestions.push(arrayQuestions[position])
         arrayQuestions.splice(position, 1)
