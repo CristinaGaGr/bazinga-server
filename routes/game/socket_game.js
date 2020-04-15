@@ -77,8 +77,8 @@ const startListener = (socket, io) => {
 			if (socket.room == "") {
 				console.log("fuck empty 1")
 			}
-			console.log(socket.id,socket.room)
-			if (gameId !== null && user !== null) {
+			console.log(socket.id, socket.room)
+			if (!gameId && !user) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true }
 				}
@@ -132,7 +132,7 @@ const startListener = (socket, io) => {
 						if (err || !gameResponse) {
 							console.error(err)
 						} else {
-							console.log("bye",socket.room)
+							console.log("bye", socket.room)
 							if (gameResponse !== null) {
 								let UsersArray = []
 								gameResponse.users.forEach(element => {
@@ -153,11 +153,9 @@ const startListener = (socket, io) => {
 
 		socket.on("/start", () => {
 			console.log(socket.id)
-			if (socket.room == "") {
-				console.log("fuck empty 3")
-			}
+
 			try {
-				console.log("/start",socket.room)
+				console.log("/start", socket.room)
 				Actualgames.findOneAndDelete({ game_id: socket.room }, (err, res) => {
 					if (err) {
 						console.error(err)
@@ -185,7 +183,7 @@ const startListener = (socket, io) => {
 			if (socket.room.length < 10) {
 				console.log("fuck")
 			}
-			console.log("sending new question",socket.room)
+			console.log("sending new question", socket.room)
 			try {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
 					io.sockets.actualGame[socket.room].waitingResponse = false
@@ -240,6 +238,7 @@ const startListener = (socket, io) => {
 					io.sockets.actualGame[socket.room].waitingResponse = true
 					io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
 					io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
+					console.log("rankiing-->", currentGame.ranking)
 					io.sockets.actualGame[socket.room].numberOfAnswers = 0
 					if (currentGame.questionNumber === currentGame.questions.length) {
 						setTimeout(() => {
