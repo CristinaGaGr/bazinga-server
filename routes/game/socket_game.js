@@ -187,7 +187,7 @@ const startListener = (socket, io) => {
 				if (await checkCorrectAnswer(questionId, answer)) {
 					points = calculateAnswerScore(time)
 				}
-				if (points > 0) {
+				if (points < 0) {
 					console.log("filtering points")
 					points = 0
 				}
