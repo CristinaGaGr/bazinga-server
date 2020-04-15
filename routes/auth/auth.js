@@ -10,7 +10,7 @@ function validateEmail(email) {
 }
 
 const setCookie = (res, user) => {
-    const token = Jwt.sign({ _id: user._id,username:user.username }, process.env.PRIVATEKEY, { expiresIn: '30d' });
+    const token = Jwt.sign({ _id: user._id, username: user.username }, process.env.PRIVATEKEY, { expiresIn: '30d' });
     ('sendingcookie')
     res.cookie('bazinga', token, {
         maxAge: 43200000,
@@ -39,28 +39,29 @@ router.post('/delete', (req, res) => {
 
 router.post('/signup', async (req, res) => {
     let { username, password, repeatPassword, email } = req.body;
-    let error= false
+    let error = false
     let responsedb = await User.find({ username });
     if (responsedb.length !== 0) {
-        error= true
-        res.status(401).send({error: "Username alredy exists"})
+        error = true
+        res.status(401).send({ error: "Username alredy exists" })
     }
     if (!validateEmail(email)) {
-        error= true
-        res.status(401).send({error: "Email not valid"})
+        error = true
+        res.status(401).send({ error: "Email not valid" })
     }
 
     if (password !== repeatPassword) {
-        error= true
-        res.status(401).send({error: "Confirm password fields are identical"})
+        error = true
+        res.status(401).send({ error: "Confirm password fields are identical" })
     }
 
     if (error === false) {
         User.create({ username: username, password, email }, (err, respUser) => {
-            setCookie(res, respUser);
-            res.json({ respUser, error })
-        });
-    } 
+            let { _id, username } = respUser
+            setCookie(res, { _id, username });
+            res.json( { _id, username })
+    });
+    }
 });
 
 
@@ -75,8 +76,10 @@ router.post('/signin', (req, res) => {
             respUser.comparePassword(password, function (err, isMatch) {
                 if (err) throw err;
                 if (isMatch) {
-                    setCookie(res, respUser);
-                    res.status(200).json(respUser);
+                    let { _id, username } = respUser
+
+                    setCookie(res, { _id, username });
+                    res.status(200).json({ _id, username });
                 } else {
                     res.status(401).send({ error: "No valid password", login: false });
                 }
