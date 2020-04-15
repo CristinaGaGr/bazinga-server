@@ -26,7 +26,7 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
     let selectedQuestions = []
     arrayQuestions = await Questions.find({ category: categories, difficulty: dificulty }, { _id: 1 })
     let numberResponseMongo = arrayQuestions.length
-    for (let i = 0; i < numberOfQuestions  && i < numberResponseMongo; i++) {
+    for (let i = 0; i < numberOfQuestions && i < numberResponseMongo; i++) {
         let position = Math.round(Math.random() * arrayQuestions.length)
         selectedQuestions.push(arrayQuestions[position])
         arrayQuestions.splice(position, 1)
@@ -37,22 +37,18 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
 
 
 router.post('/', async (req, res) => {
-
+    console.log(req.body)
     let { username, difficulty, categories, numberOfQuestions } = req.body;
     const arrayQuestions = await questionGenerator(numberOfQuestions, difficulty, categories);
     const { pin, game_id } = await pinGenerator();
-    if (req.userId === null) {
-        await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, nologgedOwner: username })
-    } else {
-        await User.findById(req.userId, (err, resp) => { username = resp.username });
-        await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, owner: username })
-    }
+    res.send({ pin, game_id })
+    await Game.findByIdAndUpdate(game_id, { questions: arrayQuestions, owner: username })
+
     setTimeout(() => {
         Actualgames.findOneAndDelete({ game_id }, (err, res) => {
         })
         console.log("cleaning unstarted game..", game_id)
     }, 30 * 60 * 1000);
-    res.send({ pin, game_id })
 });
 
 
@@ -85,19 +81,19 @@ router.get('/check', (req, res) => {
     try {
         Actualgames.findOne({ pin }).populate('game_id').exec((err, actualGame) => {
             if (err || !actualGame) {
-                res.status(403).send({error: "Invalid Pin"});
+                res.status(403).send({ error: "Invalid Pin" });
                 return;
             }
             if (actualGame.game_id.users.findIndex(user => user.username === username) === -1) {
                 res.status(200).send()
             } else {
-                res.status(403).send({error: "Username in use"});
+                res.status(403).send({ error: "Username in use" });
             }
         })
 
     } catch (error) {
         console.log(error)
-        
+
     }
 })
 
