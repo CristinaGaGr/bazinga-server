@@ -9,8 +9,10 @@ const connection = (io) => {
 		console.log('New user connected');
 		socket.on('disconnect', () => {
 			try {
-
 				io.sockets.actualGame[socket.room].numberOfPlayersAtRoom--
+				io.sockets.to(socket.room).emit("/answer", null, null, null, true);
+		
+			
 			} catch (error) {
 
 			}
