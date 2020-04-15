@@ -77,6 +77,7 @@ const startListener = (socket, io) => {
 			if (socket.room == "") {
 				console.log("fuck empty 1")
 			}
+			console.log(socket.id,socket.room)
 			if (gameId !== null && user !== null) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true }
@@ -110,6 +111,7 @@ const startListener = (socket, io) => {
 				console.log("fuck empty 2")
 			}
 			try {
+				console.log(socket.id)
 				if (owner) {
 					console.log("/bye owner")
 					Game.findById(socket.room, (err, game) => {
@@ -130,7 +132,7 @@ const startListener = (socket, io) => {
 						if (err || !gameResponse) {
 							console.error(err)
 						} else {
-							console.log("bye")
+							console.log("bye",socket.room)
 							if (gameResponse !== null) {
 								let UsersArray = []
 								gameResponse.users.forEach(element => {
@@ -150,11 +152,12 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/start", () => {
+			console.log(socket.id)
 			if (socket.room == "") {
 				console.log("fuck empty 3")
 			}
 			try {
-				console.log("/start")
+				console.log("/start",socket.room)
 				Actualgames.findOneAndDelete({ game_id: socket.room }, (err, res) => {
 					if (err) {
 						console.error(err)
@@ -182,7 +185,7 @@ const startListener = (socket, io) => {
 			if (socket.room.length < 10) {
 				console.log("fuck")
 			}
-			console.log("sending new question")
+			console.log("sending new question",socket.room)
 			try {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
 					io.sockets.actualGame[socket.room].waitingResponse = false
