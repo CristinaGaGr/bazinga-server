@@ -78,6 +78,7 @@ const startListener = (socket, io) => {
 				console.log("fuck empty 1")
 			}
 			console.log(socket.id, socket.room)
+			console.log(gameId,user)
 			if (!gameId && !user) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true }
@@ -240,12 +241,7 @@ const startListener = (socket, io) => {
 					io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
 					console.log("rankiing-->", currentGame.ranking)
 					io.sockets.actualGame[socket.room].numberOfAnswers = 0
-					if (currentGame.questionNumber === currentGame.questions.length) {
-						setTimeout(() => {
-							console.log("delete socket room")
-							delete io.sockets.actualGame[socket.room]
-						}, 1000 * 60);
-					}
+					
 				} else {
 					console.log("answer recived waiting all user answer")
 				}
