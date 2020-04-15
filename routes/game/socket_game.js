@@ -214,11 +214,12 @@ const startListener = (socket, io) => {
 			if (socket.room == "") {
 				console.log("fuck empty 4")
 			}
-			
+
 			console.log("recived answer")
 			try {
+
 				if (!fromDisconect) {
-					
+
 					io.sockets.actualGame[socket.room].numberOfAnswers++
 					currentGame = await Game.findById(socket.room);
 					if (!currentGame) {
@@ -239,7 +240,9 @@ const startListener = (socket, io) => {
 						currentGame.ranking[currentGame.ranking.findIndex(obj => obj.user === socket.user.username)].score += points
 					}
 					console.log("responsetime:", time, "answer points:", points, "acumuled points:", currentGame.ranking[currentGame.ranking.findIndex(obj => obj.user === socket.user.username)].score, "number of answers", io.sockets.actualGame[socket.room].numberOfAnswers, "players at room", io.sockets.actualGame[socket.room].numberOfPlayersAtRoom)
-					 savedAnswer = { user: socket.user, question: questionId, responseTime: time, answer: answer, points: points }
+					savedAnswer = { user: socket.user, question: questionId, responseTime: time, answer: answer, points: points }
+				} else {
+					console.log("answer disconect")
 				}
 				if (io.sockets.actualGame[socket.room].numberOfAnswers === io.sockets.actualGame[socket.room].numberOfPlayersAtRoom || fromDisconect) {
 					io.sockets.actualGame[socket.room].waitingResponse = true
