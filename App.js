@@ -19,7 +19,7 @@ mongoose
 		useFindAndModify: false
 	})
 	.then(x => {
-		console.log(`Connected to Mongo! Database name: ${x.connections[0].name}`	);
+		console.log(`Connected to Mongo! Database name: ${x.connections[0].name}`);
 	})
 	.catch(err => {
 		console.error('Error connecting to mongo', err);
@@ -45,7 +45,7 @@ app.use(
 	})
 );
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 
@@ -56,7 +56,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 const server = http.createServer(app);
 
-const io = require('socket.io')(server, {pingTimeout:4000,pingInterval:1000});
+const io = require('socket.io')(server, { pingTimeout: 4000, pingInterval: 1000 });
 require('./socket.js').connection(io);
 
 
@@ -70,6 +70,10 @@ app.use(jwtMiddleware);
 app.use('/', indexRouter);
 app.use('/game', gameRouter);
 app.use('/auth', authRouter);
+//catch 404
+app.get('*', function (req, res) {
+	res.status(404).send('page not found');
+});
 // 
 
 // catch 404 and forward to error handler
