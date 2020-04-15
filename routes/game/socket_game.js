@@ -73,8 +73,10 @@ const startListener = (socket, io) => {
 			io.sockets.actualGame = {}
 		}
 
-
 		socket.on("/hello", (gameId, user) => {
+			if (socket.room == "") {
+				console.log("fuck empty 1")
+			}
 			if (gameId !== null && user !== null) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true }
@@ -93,6 +95,7 @@ const startListener = (socket, io) => {
 							gameResponse.users.forEach(element => {
 								UsersArray.push(element.username)
 							})
+							console.log(UsersArray)
 							io.sockets.to(socket.room).emit('/user', UsersArray)
 						}
 					}
@@ -103,6 +106,9 @@ const startListener = (socket, io) => {
 		})
 
 		socket.on("/bye", (user, owner) => {
+			if (socket.room == "") {
+				console.log("fuck empty 2")
+			}
 			try {
 				if (owner) {
 					console.log("/bye owner")
@@ -144,6 +150,9 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/start", () => {
+			if (socket.room == "") {
+				console.log("fuck empty 3")
+			}
 			try {
 				console.log("/start")
 				Actualgames.findOneAndDelete({ game_id: socket.room }, (err, res) => {
@@ -162,7 +171,7 @@ const startListener = (socket, io) => {
 
 				})
 			} catch (error) {
-				console.log(error)
+				console.error(error)
 
 			}
 
@@ -170,6 +179,9 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/new-question", () => {
+			if (socket.room.length < 10) {
+				console.log("fuck")
+			}
 			console.log("sending new question")
 			try {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
@@ -185,7 +197,7 @@ const startListener = (socket, io) => {
 					})
 				}
 			} catch (error) {
-				console.log(error)
+				console.error(error)
 			}
 		})
 
@@ -193,6 +205,9 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/answer", async (questionId, answer, time) => {
+			if (socket.room == "") {
+				console.log("fuck empty 4")
+			}
 			console.log("recived answer")
 			try {
 				io.sockets.actualGame[socket.room].numberOfAnswers++
@@ -235,7 +250,7 @@ const startListener = (socket, io) => {
 				currentGame.savedAnswer.push(savedAnswer)
 				await currentGame.save()
 			} catch (error) {
-				console.log(error)
+				console.error(error)
 			}
 		})
 	} catch (error) {
