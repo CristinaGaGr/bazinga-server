@@ -204,12 +204,13 @@ const startListener = (socket, io) => {
 		})
 
 		socket.on("/waited", async (questionId) => {
-			console.log("sending correct answer")
+			console.log("sending correct answer waited")
 			io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId))
-			console.log("sending ranking")
+			console.log("sending ranking waited")
 			const currentGame = await Game.findById(socket.room);
 			if (currentGame) {
-
+				io.sockets.actualGame[socket.room].waitingResponse = true
+				io.sockets.actualGame[socket.room].numberOfAnswers = 0
 				io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
 			}
 		})
