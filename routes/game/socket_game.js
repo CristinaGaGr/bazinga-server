@@ -92,10 +92,11 @@ const startListener = (socket, io) => {
 			}
 		})
 
-		socket.on("/bye", (user) => {
+		socket.on("/bye", (user,owner) => {
 			console.log("fjaslkd")
 			try {
-				if (user.owner) {
+				if (owner) {
+					console.log("isowner")
 					Game.find(socket.room, (game) => {
 						if (game.questionNumber === 0) {
 							io.sockets.to(socket.room).emit('/die')
