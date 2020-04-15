@@ -93,10 +93,8 @@ const startListener = (socket, io) => {
 		})
 
 		socket.on("/bye", (user, owner) => {
-			console.log("fjaslkd", owner)
 			try {
 				if (owner) {
-					console.log("isowner")
 					Game.findById(socket.room, (err, game) => {
 						if (game.questionNumber === 0) {
 							console.log("emit die")
