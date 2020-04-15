@@ -93,22 +93,32 @@ const startListener = (socket, io) => {
 		})
 
 		socket.on("/bye", (user) => {
+			console.log("fjaslkd")
 			try {
-				
-				socket.leave(socket.room)
-				Game.findByIdAndUpdate(socket.room, { $pull: { users: user } }, { new: true }, (err, gameResponse) => {
-					if (gameResponse !== null) {
-						let UsersArray = []
-						gameResponse.users.forEach(element => {
-							UsersArray.push(element.username)
-						})
-						io.sockets.to(socket.room).emit('/user', UsersArray)
-					}
-				})
+				if (user.owner) {
+					Game.find(socket.room, (game) => {
+						if (game.questionNumber === 0) {
+							io.sockets.to(socket.room).emit('/die')
+						}
+					})
+				} else {
+
+					socket.leave(socket.room)
+					Game.findByIdAndUpdate(socket.room, { $pull: { users: user } }, { new: true }, (err, gameResponse) => {
+						if (gameResponse !== null) {
+							let UsersArray = []
+							gameResponse.users.forEach(element => {
+								UsersArray.push(element.username)
+							})
+							io.sockets.to(socket.room).emit('/user', UsersArray)
+						}
+					})
+				}
 			} catch (error) {
 				console.error(error)
 			}
 		})
+
 
 
 
@@ -117,7 +127,7 @@ const startListener = (socket, io) => {
 				Actualgames.findOneAndDelete({ game_id: socket.room }, (err, res) => {
 				})
 				Game.findById(socket.room, async (err, gameResponse) => {
-						let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber , gameResponse.questions.length)
+					let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length)
 					io.sockets.actualGame[socket.room].waitingResponse = true
 					io.sockets.to(socket.room).in(socket.room).emit('/question', response)
 
@@ -135,10 +145,10 @@ const startListener = (socket, io) => {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
 					io.sockets.actualGame[socket.room].waitingResponse = false
 					Game.findByIdAndUpdate(socket.room, { $inc: { questionNumber: 1 } }, { new: true }, async (err, gameResponse) => {
-					//	if (gameResponse.questionNumber <= gameResponse.questions.length) {
-							let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber , gameResponse.questions.length, gameResponse.questionNumber)
-							io.sockets.to(socket.room).in(socket.room).emit('/question', response)
-					//	}
+						//	if (gameResponse.questionNumber <= gameResponse.questions.length) {
+						let response = await getNextCuestion(gameResponse.questions[gameResponse.questionNumber], gameResponse.questionNumber, gameResponse.questions.length, gameResponse.questionNumber)
+						io.sockets.to(socket.room).in(socket.room).emit('/question', response)
+						//	}
 					})
 				}
 			} catch (error) {
