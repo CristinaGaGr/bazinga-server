@@ -78,7 +78,7 @@ const startListener = (socket, io) => {
 				console.log("fuck empty 1")
 			}
 			console.log(socket.id, socket.room)
-			console.log(gameId, user)
+			console.log(gameId,user)
 			if (gameId && user) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true }
@@ -108,7 +108,9 @@ const startListener = (socket, io) => {
 		})
 
 		socket.on("/bye", (user, owner) => {
-
+			if (socket.room == "") {
+				console.log("fuck empty 2")
+			}
 			try {
 				console.log(socket.id)
 				if (owner) {
@@ -121,8 +123,6 @@ const startListener = (socket, io) => {
 							if (game.questionNumber === 0) {
 								console.log("emit die")
 								io.sockets.to(socket.room).emit('/die')
-								socket.leave(socket.room)
-
 							}
 						}
 					})
@@ -203,7 +203,7 @@ const startListener = (socket, io) => {
 			}
 		})
 
-
+		socket.on("/")
 
 
 		socket.on("/answer", async (questionId, answer, time, fromDisconect) => {
@@ -253,6 +253,7 @@ const startListener = (socket, io) => {
 					io.sockets.to(socket.room).emit("/ranking", currentGame.ranking)
 					console.log("rankiing-->", currentGame.ranking)
 					io.sockets.actualGame[socket.room].numberOfAnswers = 0
+					
 				} else {
 					console.log("answer recived waiting all user answer")
 				}
