@@ -207,6 +207,7 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/answer", async (questionId, answer, time, fromDisconect) => {
+			console.log(questionId, answer, time, fromDisconect)
 			let savedAnswer
 			let ranking
 			let points = 0
