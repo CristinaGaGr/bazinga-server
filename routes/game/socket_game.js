@@ -48,7 +48,7 @@ const getNextCuestion = async (questionId, questionNumber, totalquestions) => {
 const correctAnswer = async (questionId) => {
 	let answer
 	await questions.findById(questionId, async (err, questionsResponse) => {
-		if (!gameResponse) {
+		if (!questionsResponse) {
 			return
 		}
 
