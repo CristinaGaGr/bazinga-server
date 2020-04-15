@@ -9,6 +9,14 @@ The new quizz game
 
 Bazzinga is a movile quizz game that allows users to compete against friends. 
 
+PORT=4000
+DBNAME=BAZINGA
+FRONT=https://bazinga.ragulion.online
+BACK=https://apibazinga.ragulion.online
+PRIVATEKEY=BAZINGATOKENKEY
+
+
+
 The game's questions are based on 9 knowledge categories: 
 
 - Books :blue_book:
