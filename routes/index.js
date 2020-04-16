@@ -7,10 +7,16 @@ module.exports = (io) => {
     router.get('/me', (req, res, next) => {
         if (req.userId) {
             User.findById(req.userId._id, (err, response) => {
-                res.send({ username: response.username, _id: response._id });
-            })
+                if (response !== null) {
+                    
+                    res.send({ username: response.username, _id: response._id });
+                } else {
+                    
+                    res.send(null);
+                }
+            });
         } else {
-            res.send(null)
+            res.send(null);
         }
     });
 
