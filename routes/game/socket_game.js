@@ -1,6 +1,6 @@
-const Game = require('../../models/game')
-const Actualgames = require("../../models/actual")
-const questions = require('../../models/questions')
+const Game = require('../../models/game');
+const Actualgames = require("../../models/actual");
+const questions = require('../../models/questions');
 const valueCorrect = 1000;
 const maxResponseTime = 10000;
 
@@ -24,9 +24,9 @@ const randomOrderOfquestions = (correct, incorrects) => {
 
 	}
 	return array;
-}
+};
 const getNextCuestion = async (questionId, questionNumber, totalQuestions) => {
-	let response = { category: "", type: "", question: "", options: "", id: "", questionNumber: questionNumber + 1, totalQuestions: totalQuestions }
+	let response = { category: "", type: "", question: "", options: "", id: "", questionNumber: questionNumber + 1, totalQuestions: totalQuestions };
 	let questionResponse = await questions.findById(questionId);
 	if (!questionResponse) {
 		return;
@@ -44,7 +44,7 @@ const getNextCuestion = async (questionId, questionNumber, totalQuestions) => {
 	response.options = mixedAnswers;
 	response.id = questionResponse._id;
 	return response;
-}
+};
 const correctAnswer = async (questionId) => {
 	let answer;
 	await questions.findById(questionId, async (err, questionsResponse) => {
@@ -56,17 +56,17 @@ const correctAnswer = async (questionId) => {
 
 	});
 	return String(answer);
-}
+};
 
 const checkCorrectAnswer = async (questionId, answer) => {
 	return answer === await correctAnswer(questionId);
-}
+};
 
 
 const startListener = (socket, io) => {
 	try {
 		if (io.sockets.actualGame === undefined) {
-			io.sockets.actualGame = {}
+			io.sockets.actualGame = {};
 		}
 
 		socket.on("/hello", (gameId, user) => {
@@ -150,7 +150,7 @@ const startListener = (socket, io) => {
 					if (err) {
 						console.error(err);
 					}
-				})
+				});
 				Game.findById(socket.room, async (err, gameResponse) => {
 					if (err || !gameResponse) {
 						console.error(err);
@@ -204,9 +204,9 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/answer", async (questionId, answer, time) => {
-			console.log("recived answer")
+			console.log("recived answer");
 			try {
-				io.sockets.actualGame[socket.room].numberOfAnswers++
+				io.sockets.actualGame[socket.room].numberOfAnswers++;
 				const currentGame = await Game.findById(socket.room);
 				if (!currentGame) {
 					console.log("error");
@@ -255,4 +255,4 @@ const startListener = (socket, io) => {
 
 module.exports = {
 	startListener
-}
+};

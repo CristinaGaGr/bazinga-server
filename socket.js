@@ -11,7 +11,7 @@ const connection = (io) => {
 			try {
 				io.sockets.actualGame[socket.room].numberOfPlayersAtRoom--;
 			} catch (error) {
-				console.error(error)
+				console.error(error);
 			}
 			console.log('User disconnected');
 		});
