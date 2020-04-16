@@ -11,6 +11,7 @@ const calculateAnswerScore = (time) => {
 // valueTime = valueCorrect - valueCorrect / maxResponseTime * 100
 
 const randomOrderOfquestions = (correct, incorrects) => {
+	console.log(correct)
 	let array = []
 	let count = 0
 	let positionOfCorrcetAnswer = Math.floor(Math.random() * incorrects.length + 1)
