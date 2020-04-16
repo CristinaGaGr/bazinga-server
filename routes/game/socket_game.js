@@ -70,6 +70,7 @@ const startListener = (socket, io) => {
 		}
 
 		socket.on("/hello", (gameId, user) => {
+			console.log("hello")
 			if (gameId && user) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true };
@@ -100,7 +101,7 @@ const startListener = (socket, io) => {
 		});
 
 		socket.on("/bye", (user, owner) => {
-
+			console.log("bye")
 			try {
 				console.log(socket.id);
 				if (owner) {
@@ -170,6 +171,7 @@ const startListener = (socket, io) => {
 
 
 		socket.on("/new-question", () => {
+			console.log("new-question")
 			console.log("sending new question", socket.room);
 			try {
 				if (io.sockets.actualGame[socket.room].waitingResponse) {
@@ -189,6 +191,7 @@ const startListener = (socket, io) => {
 		});
 
 		socket.on("/waited", async (questionId) => {
+			console.log("wait")
 			console.log("sending correct answer waited");
 			io.sockets.to(socket.room).emit("/correct-answer", await correctAnswer(questionId));
 			console.log("sending ranking waited");
