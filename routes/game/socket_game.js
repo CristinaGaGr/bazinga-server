@@ -70,7 +70,6 @@ const startListener = (socket, io) => {
 		}
 
 		socket.on("/hello", (gameId, user) => {
-			console.log("socket.id", socket.id, "socket.room", socket.room, "socket.username", socket.username, "gameId", gameId, "usern", user);
 			if (gameId && user) {
 				if (io.sockets.actualGame[gameId] === undefined) {
 					io.sockets.actualGame[gameId] = { numberOfAnswers: 0, numberOfPlayersAtRoom: 0, waitingResponse: true };
@@ -79,6 +78,7 @@ const startListener = (socket, io) => {
 				socket.user = user;
 				socket.join(gameId);
 				socket.room = gameId;
+				console.log("socket.id", socket.id, "socket.room", socket.room, "socket.username", socket.username, "gameId", gameId, "usern", user);
 				Game.findByIdAndUpdate(gameId, { $push: { users: user } }, { new: true }, (err, gameResponse) => {
 					if (err || !gameResponse) {
 						console.error(err);
