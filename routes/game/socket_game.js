@@ -59,11 +59,7 @@ const correctAnswer = async (questionId) => {
 }
 
 const checkCorrectAnswer = async (questionId, answer) => {
-	let correct = false
-	if (answer === await correctAnswer(questionId)) {
-		correct = true
-	}
-	return correct
+	return answer === await correctAnswer(questionId)
 }
 
 
