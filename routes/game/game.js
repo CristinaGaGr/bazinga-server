@@ -39,6 +39,10 @@ const questionGenerator = async (numberOfQuestions, dificulty, categories) => {
 router.post('/', async (req, res) => {
     console.log(req.body);
     let { username, difficulty, categories, numberOfQuestions } = req.body;
+    if ((/[^A-Za-z0-9]+/g).test(username)) {
+        res.status(403).send({ error: "Invalid characters in username" });
+        return;
+    }
     const arrayQuestions = await questionGenerator(numberOfQuestions, difficulty, categories);
     const { pin, game_id } = await pinGenerator();
     res.send({ pin, game_id });
@@ -61,7 +65,7 @@ router.post('/join', async (req, res) => {
     if (actualGame.game_id.id === "") {
         res.status(404).send("pincode not valid or game started");
     } else {
-
+   
         if (req.userId) {
             Game.findByIdAndUpdate(actualGame.game_id, { $push: { users: req.userId } });
         } else {
