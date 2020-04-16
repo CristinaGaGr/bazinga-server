@@ -41,18 +41,22 @@ try {
         let { username, password, repeatPassword, email } = req.body;
         let error = false;
         let responsedb = await User.find({ username });
+        if ((/[^A-Za-z0-9]+/g).test(username)) {
+            res.status(403).send({ error: "Invalid characters in username" });
+            return;
+        }
         if (responsedb.length !== 0) {
-            error = true;
             res.status(401).send({ error: "Username alredy exists" });
+            return;
         }
         if (!validateEmail(email)) {
-            error = true;
             res.status(401).send({ error: "Email not valid" });
+            return;
         }
 
         if (password !== repeatPassword) {
-            error = true;
             res.status(401).send({ error: "Confirm password fields are identical" });
+            return;
         }
 
         if (error === false) {
