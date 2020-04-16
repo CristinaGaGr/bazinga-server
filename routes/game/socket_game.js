@@ -36,7 +36,7 @@ const getNextCuestion = async (questionId, questionNumber, totalQuestions) => {
 		mixedAnswers = randomOrderOfquestions(questionResponse.correct_answer, questionResponse.incorrect_answers);
 
 	} else {
-		mixedAnswers = [questionResponse.correct_answer, questionResponse.incorrect_answers[0]];
+		mixedAnswers = [questionResponse.correct_answer, questionResponse.incorrect_answers[0]].sort().reverse();
 	}
 	response.category = questionResponse.category;
 	response.type = questionResponse.type;
