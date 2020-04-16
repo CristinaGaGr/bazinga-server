@@ -14,7 +14,7 @@ try {
         const token = Jwt.sign({ _id: user._id, username: user.username }, process.env.PRIVATEKEY, { expiresIn: '30d' });
         res.cookie('bazinga', token, {
             maxAge: 43200000,
-            httpOnly: false,
+            httpOnly: true,
             secure: false
         });
     };
@@ -39,28 +39,23 @@ try {
 
     router.post('/signup', async (req, res) => {
         let { username, password, repeatPassword, email } = req.body;
-        console.log("signup", req.body);
         let error = false;
         let responsedb = await User.find({ username });
         if (responsedb.length !== 0) {
             error = true;
-            console.log("username exists");
             res.status(401).send({ error: "Username alredy exists" });
         }
         if (!validateEmail(email)) {
             error = true;
-            console.log("email not valid");
             res.status(401).send({ error: "Email not valid" });
         }
 
         if (password !== repeatPassword) {
             error = true;
-            console.log("paswords not identical");
             res.status(401).send({ error: "Confirm password fields are identical" });
         }
 
         if (error === false) {
-            console.log("all validated");
             User.create({ username: username, password, email }, (err, respUser) => {
                 let { _id, username } = respUser;
                 console.log(respUser);
@@ -73,12 +68,9 @@ try {
 
     router.post('/signin', (req, res) => {
         let { username, password } = req.body;
-        console.log("signup", req.body);
-
         User.findOne({ username }, (err, respUser) => {
             if (err) throw err;
             if (respUser === null) {
-                console.log("user not exist");
                 res.status(401).send({ error: "No valid password", login: false });
 
             } else {
@@ -86,12 +78,9 @@ try {
                     if (err) throw err;
                     if (isMatch) {
                         let { _id, username } = respUser;
-                        console.log("signup ok");
                         setCookie(res, { _id, username });
                         res.status(200).json({ _id, username });
                     } else {
-                        console.log("no valid password");
-
                         res.status(401).send({ error: "No valid password", login: false });
                     }
                 });
