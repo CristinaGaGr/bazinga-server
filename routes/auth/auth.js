@@ -58,7 +58,6 @@ try {
         if (error === false) {
             User.create({ username: username, password, email }, (err, respUser) => {
                 let { _id, username } = respUser;
-                console.log(respUser);
                 setCookie(res, { _id, username });
                 res.json({ _id, username });
             });
